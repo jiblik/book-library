@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Моя библиотека</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E8620A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Библиотека">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FDFBF7;--bg-card:#FFFFFF;--accent:#E8620A;--accent-light:#FFF3EB;--accent-dark:#C45207;--text:#1A1A1A;--text-sec:#6B6560;--text-mut:#9B9590;--border:#EDE8E3;--sh-sm:0 1px 3px rgba(26,26,26,.06);--sh-md:0 4px 12px rgba(26,26,26,.08);--sh-lg:0 8px 30px rgba(26,26,26,.12);--sh-xl:0 20px 50px rgba(26,26,26,.15);--r:12px;--rl:16px}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
+.hero{background:linear-gradient(135deg,#1A1A1A 0%,#2D1F14 40%,#4A2E15 70%,#E8620A 100%);padding:60px 40px 50px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(232,98,10,.2) 0%,transparent 70%);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-30%;left:10%;width:400px;height:400px;background:radial-gradient(circle,rgba(232,98,10,.1) 0%,transparent 70%);border-radius:50%}
+.hero-content{max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.hero-label{display:inline-flex;align-items:center;gap:8px;background:rgba(232,98,10,.15);border:1px solid rgba(232,98,10,.3);border-radius:20px;padding:6px 16px;font-size:13px;color:#F4A66A;margin-bottom:20px;letter-spacing:.5px;text-transform:uppercase;font-weight:500}
+.hero-label svg{width:16px;height:16px}
+.hero h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:700;color:#FFF;margin-bottom:12px;letter-spacing:-.5px}
+.hero-sub{font-size:1.1rem;color:rgba(255,255,255,.6);margin-bottom:40px;max-width:500px}
+.hero-stats{display:flex;gap:40px;flex-wrap:wrap}
+.stat-card{background:rgba(255,255,255,.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:24px 30px;min-width:180px;transition:transform .3s,background .3s;animation:fadeUp .5s ease forwards;opacity:0}
+.stat-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.12)}
+.stat-num{font-family:'DM Sans',sans-serif;font-size:2.5rem;font-weight:700;color:#FFF;line-height:1.1}
+.stat-num .ac{color:var(--accent)}
+.stat-lbl{font-size:.85rem;color:rgba(255,255,255,.5);margin-top:4px;text-transform:uppercase;letter-spacing:1px;font-weight:500}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(26,26,26,.5);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:center;justify-content:center;padding:30px;overflow-y:auto}
+.modal-overlay.active{display:flex}
+.modal-card{background:var(--bg-card);border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.2);animation:fadeUp .25s ease;position:relative}
+.modal-close{position:sticky;top:12px;float:right;margin-right:12px;width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,.06);color:var(--text-sec);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:all .2s;backdrop-filter:blur(4px)}
+.modal-close:hover{background:rgba(0,0,0,.12);color:var(--text)}
+.modal-inner{padding:0 28px 32px;text-align:center}
+.modal-cover-wrap{width:140px;height:210px;margin:0 auto 20px;border-radius:8px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.15);background:linear-gradient(145deg,#F0E6DA,#E5D8CC);display:flex;align-items:center;justify-content:center}
+.modal-cover-wrap img{width:100%;height:100%;object-fit:cover}
+.modal-cover-wrap .c-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:10px}
+.modal-inner h2{font-family:'DM Sans',sans-serif;font-size:1.25rem;font-weight:700;margin-bottom:4px;color:var(--text);line-height:1.3}
+.modal-inner .m-author{font-size:.88rem;color:var(--text-sec);margin-bottom:16px}
+.m-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.m-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:500;background:var(--accent-light);color:var(--accent-dark)}
+.m-chip svg{width:13px;height:13px}
+.modal-inner .m-ann{font-size:.87rem;color:var(--text-sec);line-height:1.7;margin-bottom:22px;text-align:left}
+.export-wrap{position:relative}
+.export-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);border-radius:var(--r);font-size:0;background:var(--bg-card);cursor:pointer;transition:border-color .2s,background .2s;padding:0}
+.export-btn:hover{border-color:var(--accent);background:var(--accent-light)}
+.export-btn svg{width:18px;height:18px;color:var(--text-sec);transition:color .2s}
+.export-btn:hover svg{color:var(--accent)}
+.export-dd{position:absolute;top:100%;right:0;margin-top:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--sh-lg);display:none;z-index:100;min-width:150px;overflow:hidden}
+.export-dd.active{display:block}
+.export-dd button{display:flex;align-items:center;gap:8px;width:100%;padding:11px 16px;border:none;background:none;font-size:.84rem;font-family:inherit;color:var(--text);cursor:pointer;transition:background .15s}
+.export-dd button:hover{background:var(--accent-light)}
+.export-dd button svg{width:14px;height:14px;color:var(--text-mut)}
+.book-card.bc-visible{animation:fadeUp .4s ease forwards}
+.book-card.bc-hidden{opacity:0;transform:translateY(20px)}
+.controls{max-width:1200px;margin:0 auto 30px;padding:36px 40px 0;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:250px;position:relative}
+.search-box svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text-mut);pointer-events:none}
+.search-box input{width:100%;padding:14px 18px 14px 48px;border:1px solid var(--border);border-radius:var(--r);font-size:.95rem;font-family:inherit;background:var(--bg-card);color:var(--text);transition:border-color .2s,box-shadow .2s;outline:none}
+.search-box input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,98,10,.1)}
+.search-box input::placeholder{color:var(--text-mut)}
+.fsel{padding:14px 40px 14px 18px;border:1px solid var(--border);border-radius:var(--r);font-size:.95rem;font-family:inherit;background:var(--bg-card);color:var(--text);cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239B9590' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;transition:border-color .2s}
+.fsel:focus{border-color:var(--accent)}
+.bcl{font-size:.9rem;color:var(--text-mut);margin-left:auto}
+.bcl strong{color:var(--text);font-weight:600}
+.book-grid{max-width:1200px;margin:0 auto;padding:0 40px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:24px}
+.book-card{background:var(--bg-card);border-radius:var(--rl);border:1px solid var(--border);overflow:visible;transition:transform .3s,box-shadow .3s;cursor:pointer;position:relative}
+.book-card:hover{transform:translateY(-8px);box-shadow:var(--sh-xl)}
+.book-card:hover .b-ann{opacity:1;visibility:visible}
+.book-cover{width:100%;aspect-ratio:2/3;background:linear-gradient(135deg,#F5EDE6,#E8DDD4);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:var(--rl) var(--rl) 0 0}
+.book-cover img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.book-card:hover .book-cover img{transform:scale(1.05)}
+.c-ph{padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background:linear-gradient(145deg,#F0E6DA,#E5D8CC)}
+.c-ph .phi{width:40px;height:40px;margin-bottom:12px;opacity:.3}
+.c-ph .pht{font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;color:var(--text-sec);line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.brb{position:absolute;top:10px;right:10px;background:rgba(26,26,26,.75);backdrop-filter:blur(6px);color:#fff;font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:10px;display:flex;align-items:center;gap:4px}
+.brb svg{width:12px;height:12px;color:#FFD700}
+.b-upl{position:absolute;top:10px;left:10px;width:32px;height:32px;background:rgba(232,98,10,.85);backdrop-filter:blur(6px);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;z-index:60;pointer-events:none}
+.book-card:hover .b-upl{opacity:1;pointer-events:auto}
+.b-upl:hover{background:rgba(232,98,10,1);transform:scale(1.1)}
+.b-upl svg{width:16px;height:16px;color:#fff;pointer-events:none}
+.b-info{padding:14px 16px 16px}
+.b-title{font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;line-height:1.35;margin-bottom:4px;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.b-author{font-size:.8rem;color:var(--text-sec);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.b-stars{display:flex;gap:2px}
+.b-stars svg{width:13px;height:13px}
+.sf{color:#FFB800}
+.se{color:#DDD8D3}
+.b-dur{font-size:.75rem;color:var(--text-mut);white-space:nowrap}
+.b-year{font-size:.72rem;color:var(--text-mut);margin-top:4px}
+.b-ann{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(26,26,26,.92);color:#fff;font-size:.82rem;line-height:1.6;padding:20px 16px;border-radius:var(--rl);opacity:0;visibility:hidden;transition:all .3s;z-index:50;pointer-events:none;display:flex;align-items:center;text-align:center;justify-content:center;backdrop-filter:blur(4px)}
+.ldc{max-width:1200px;margin:0 auto;padding:80px 40px;text-align:center}
+.lds{width:50px;height:50px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ldt{color:var(--text-sec);font-size:1rem}
+.no-res{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-sec)}
+.no-res svg{width:64px;height:64px;margin-bottom:16px;color:var(--border)}
+.no-res h3{font-size:1.2rem;margin-bottom:8px;color:var(--text)}
+.footer{background:var(--text);color:#fff;padding:50px 40px;text-align:center}
+.f-stats{max-width:800px;margin:0 auto;display:flex;justify-content:center;gap:60px;flex-wrap:wrap;margin-bottom:30px}
+.f-num{font-family:'DM Sans',sans-serif;font-size:2.5rem;font-weight:700;color:var(--accent)}
+.f-lbl{font-size:.85rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px}
+.f-div{width:60px;height:2px;background:var(--accent);margin:0 auto 20px;border-radius:2px}
+.f-txt{font-size:.85rem;color:rgba(255,255,255,.4)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1024px){.hero{padding:40px 24px 36px}.hero-stats{gap:20px}.controls{padding:30px 24px 0}.book-grid{padding:0 24px 40px;gap:16px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+@media(max-width:768px){.hero{padding:32px 16px 28px}.hero h1{font-size:2rem}.hero-stats{gap:12px}.stat-card{min-width:140px;padding:16px 20px}.stat-num{font-size:1.8rem}.controls{padding:24px 16px 0;gap:10px}.search-box{min-width:100%}.book-grid{padding:0 16px 32px;gap:12px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.modal-card{margin:10px;max-width:100%}.modal-overlay{padding:10px}.footer{padding:40px 16px}.f-stats{gap:30px}.f-num{font-size:2rem}}
+@media(max-width:480px){.book-grid{grid-template-columns:repeat(2,1fr);gap:10px}.hero-stats{gap:10px}.stat-card{flex:1;min-width:100px;padding:14px 16px}.stat-num{font-size:1.5rem}.stat-lbl{font-size:.7rem}.modal-inner{padding:0 16px 24px}}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--text-mut)}
+</style>
+</head>
+<body>
+<section class="hero"><div class="hero-content">
+<div class="hero-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Аудиобиблиотека</div>
+<h1>Моя библиотека</h1>
+<p class="hero-sub">Персональная коллекция прослушанных аудиокниг с рейтингами и заметками</p>
+<div class="hero-stats">
+<div class="stat-card" style="animation-delay:.1s"><div class="stat-num" id="st-b">--</div><div class="stat-lbl">Книг</div></div>
+<div class="stat-card" style="animation-delay:.2s"><div class="stat-num" id="st-h">--</div><div class="stat-lbl">Часов</div></div>
+<div class="stat-card" style="animation-delay:.3s"><div class="stat-num" id="st-r">--</div><div class="stat-lbl">Средний рейтинг</div></div>
+<div class="stat-card" style="animation-delay:.4s"><div class="stat-num" id="st-a">--</div><div class="stat-lbl">Авторов</div></div>
+</div></div></section>
+
+
+<div class="modal-overlay" id="modal">
+<div class="modal-card">
+<button class="modal-close" id="modal-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+<div class="modal-inner">
+<div class="modal-cover-wrap"><img id="m-cover" alt=""><div class="c-ph" id="m-ph"><svg class="phi" viewBox="0 0 24 24" fill="none" stroke="#9B9590" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="pht" id="m-ph-t"></span></div></div>
+<h2 id="m-title"></h2>
+<div class="m-author" id="m-author"></div>
+<div class="m-chips" id="m-meta"></div>
+<div class="m-ann" id="m-ann"></div>
+</div>
+</div>
+</div>
+
+<div class="controls" id="ctrls" style="display:none">
+<div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="sinp" placeholder="Поиск по названию или автору..."></div>
+<select class="fsel" id="yfil"><option value="all">Все годы</option></select>
+<select class="fsel" id="rfil"><option value="all">Все рейтинги</option><option value="10">10</option><option value="9">9+</option><option value="8">8+</option><option value="7">7+</option><option value="6">6+</option><option value="low">5 и ниже</option></select>
+<select class="fsel" id="ssrt"><option value="rating-desc">По рейтингу &#8595;</option><option value="rating-asc">По рейтингу &#8593;</option><option value="title">По названию</option><option value="author">По автору</option><option value="year-desc">По году &#8595;</option><option value="year-asc">По году &#8593;</option><option value="duration-desc">По длительности &#8595;</option><option value="duration-asc">По длительности &#8593;</option></select>
+<div class="export-wrap"><button class="export-btn" id="exp-btn" title="Экспорт"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+<div class="export-dd" id="exp-dd"><button onclick="exportCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>CSV</button>
+<button onclick="exportPrint()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Печать / PDF</button></div></div>
+<div class="bcl">Показано: <strong id="shcnt">0</strong></div>
+</div>
+
+<div class="ldc" id="loading"><div class="lds"></div><div class="ldt">Загрузка библиотеки...</div></div>
+<div class="book-grid" id="bgrid" style="display:none"></div>
+
+<footer class="footer" id="ftr" style="display:none">
+<div class="f-stats">
+<div><div class="f-num" id="fb">0</div><div class="f-lbl">Книг прослушано</div></div>
+<div><div class="f-num" id="fh">0</div><div class="f-lbl">Часов аудио</div></div>
+<div><div class="f-num" id="fd">0</div><div class="f-lbl">Дней непрерывного слушания</div></div>
+</div>
+<div class="f-div"></div>
+<p class="f-txt">Данные загружаются из Google Sheets автоматически</p>
+</footer>
+
+<script>
+/* ====== TITLE MAP ====== */
+var TM={"Sapiens: Краткая история человечества":"Sapiens Yuval Noah Harari","Homo Deus: Краткая история завтрашнего дня":"Homo Deus Yuval Noah Harari","21 урок для XXI века":"21 Lessons for the 21st Century Harari","21 урок для XXI века\n":"21 Lessons for the 21st Century Harari","1984":"1984 George Orwell","Скотный двор":"Animal Farm George Orwell","Скотный двор ":"Animal Farm George Orwell","Памяти Каталонии":"Homage to Catalonia Orwell","Анна Каренина":"Anna Karenina Tolstoy","Война и мир":"War and Peace Tolstoy","Война и мир ":"War and Peace Tolstoy","Воскресение":"Resurrection Leo Tolstoy","Архипелаг ГУЛАГ":"Gulag Archipelago Solzhenitsyn","Архипелаг ГУЛАГ ":"Gulag Archipelago Solzhenitsyn","Матрёнин двор":"Matryona Place Solzhenitsyn","Один день Ивана Денисовича":"One Day Ivan Denisovich Solzhenitsyn","10 негритят":"And Then There Were None Agatha Christie","Убийство в Восточном экспрессе":"Murder on the Orient Express Christie","Вокруг света за 80 дней":"Around the World in Eighty Days Verne","20000 лье под водой":"Twenty Thousand Leagues Under Sea Verne","Дети капитана Гранта":"In Search of the Castaways Verne","Лолита":"Lolita Vladimir Nabokov","Камера обскура":"Laughter in the Dark Nabokov","Защита Лужина":"The Luzhin Defense Nabokov","Д'Артаньян и три мушкетёра":"The Three Musketeers Dumas","Д'Артаньян и три мушкетёра ":"The Three Musketeers Dumas","Граф Монте Кристо":"Count of Monte Cristo Dumas","12 стульев":"The Twelve Chairs Ilf Petrov","Мёртвые души":"Dead Souls Gogol","Вий":"Viy Gogol","Шинель":"The Overcoat Gogol","Тарас Бульба":"Taras Bulba Gogol","Собачье сердце":"Heart of a Dog Bulgakov","Записки юного врача":"A Young Doctor's Notebook Bulgakov","קוספא שחורה":"Black Box Amos Oz","פימה":"Fima Amos Oz","מיכאל שלי":"My Michael Amos Oz","יהודה":"Judas Amos Oz","פנתר במרתף":"Panther in the Basement Amos Oz","שליחותו של הממונה על משאבי אנוש":"A Woman in Jerusalem Yehoshua","שלושה ימים וילד":"Three Days and a Child Yehoshua","המנהרה":"The Tunnel Yehoshua","גדר חיה":"All the Rivers Dorit Rabinyan","Чемодан":"The Suitcase Dovlatov","Робинзон Крузо":"Robinson Crusoe Defoe","451 градус по Фаренгейту":"Fahrenheit 451 Bradbury","Три товарища":"Three Comrades Remarque","Триумфальная арка":"Arch of Triumph Remarque","Ночь в Лиссабоне":"The Night in Lisbon Remarque","На западном фронте без перемен":"All Quiet on the Western Front Remarque","Отцы и дети":"Fathers and Sons Turgenev","Обломов":"Oblomov Goncharov","מישהו לרוץ איתו":"Someone to Run With David Grossman","איתי החיים משחק הרבה":"More Than I Love My Life Grossman","סוס אחד נכנס לבר":"A Horse Walks into a Bar Grossman","נוכחים נפקדים":"The Yellow Wind David Grossman","פני השטח":"פני השטח אוהד חמו","פני השטח ":"פני השטח אוהד חמו","Текст":"Текст Глуховский","Пост":"Пост Глуховский","Пост. Спастись и сохранить.":"Пост Спастись Глуховский","Рассказы о Родине":"Рассказы о Родине Глуховский","Чапаев и пустота":"Buddha's Little Finger Pelevin","על עקבים במזרח התיכון":"על עקבים במזרח התיכון סבטלובה","Книги о Шерлоке Холмсе":"Sherlock Holmes Complete Doyle","Собор Парижской Богоматери":"Hunchback of Notre-Dame Hugo","Приключения Тома Сойера":"Adventures of Tom Sawyer Twain","Приключения Гека Финна":"Adventures Huckleberry Finn Twain","Весь Гарри Поттер":"Harry Potter Complete Collection Rowling","נתניהו - ביוגרפיה":"נתניהו ביוגרפיה בן כספית","Чернобыльская молитва":"Voices from Chernobyl Alexievich","Чернобыльская молитва ":"Voices from Chernobyl Alexievich","Риф":"Риф Алексей Поляринов","147 свиданий":"147 свиданий Хакова","Милый друг":"Bel-Ami Maupassant","ארץ איומה":"A Terrible Country Keith Gessen","Аэпопорт":"Airport Arthur Hailey 1968 novel","Хроники заводной птицы":"The Wind-Up Bird Chronicle Murakami","Рассказ служанки":"The Handmaid's Tale Atwood","Побег из Шоушенка":"Shawshank Redemption Stephen King","Зелёная миля":"The Green Mile Stephen King","Письмо незнакомки":"Letter from an Unknown Woman Zweig","Книжный вор":"The Book Thief Zusak","Процесс":"The Trial Franz Kafka","Над кукушкиным гнездом":"One Flew Over the Cuckoo's Nest Kesey","Тевье-молочник":"Tevye the Dairyman Sholem Aleichem","Кровавая шутка":"The Bloody Hoax Sholem Aleichem","Мальчик Мотл":"Motl the Cantor's Son Sholem Aleichem","Менахем-Мендл":"Menachem-Mendl Sholem Aleichem","И дольше века длится день":"The Day Lasts More Than a Hundred Years Aitmatov","Ход королевы":"The Queen's Gambit Walter Tevis","Бабий яр":"Babi Yar Kuznetsov","Белый клык":"White Fang Jack London","Дневник Анны Франк":"The Diary of Anne Frank","Москва-2042":"Moscow 2042 Voinovich","Вальс на прощание":"The Farewell Waltz Kundera","האיש שלנו בווהאן":"האיש שלנו בווהאן עופר דקל","Богатый папа, бедный папа":"Rich Dad Poor Dad Kiyosaki","Всадник без головы":"The Headless Horseman Mayne Reid","Бегущий за ветром":"The Kite Runner Hosseini","Тысяча сияющих солнц":"A Thousand Splendid Suns Hosseini","Портрет Дориана Грея":"The Picture of Dorian Gray Wilde","Зулейха открывает глаза":"Zuleikha Opens Her Eyes Yakhina","Эшелон на Самарканд":"Echelon to Samarkand Yakhina","Великий преемник. Божественно совершенная судьба выдающегося товарища Ким Чен Ына":"The Great Successor Kim Jong Un Fifield","Великий преемник...":"The Great Successor Anna Fifield","Код да Винчи":"The Da Vinci Code Dan Brown","Сын Хамас":"Son of Hamas Mosab Yousef","ארבעה בתים וגעגוע":"ארבעה בתים וגעגוע אשכול נבו","הראיון האחרון":"הראיון האחרון אשכול נבו","צימר בגבעתיים":"צימר בגבעתיים אשכול נבו","נוילנד":"Neuland Eshkol Nevo","שלוש קומות":"Three Floors Up Eshkol Nevo","גבר נכנס בפרדס":"גבר נכנס בפרדס אשכול נבו","לב רעב":"לב רעב אשכול נבו","משאלה אחת ימינה":"World Cup Wishes Eshkol Nevo","המקווה האחרון בסיביר":"המקווה האחרון בסיביר אשכול נבו","תקוות שחורות":"תקוות שחורות נתן זהבי","מרן - הרב עובדיה יוסף":"Maran Rabbi Ovadia Yosef biography","עקוב אחר השינויים":"Track Changes Sayed Kashua","ויהי בוקר":"Let It Be Morning Sayed Kashua","פרא אציל":"פרא אציל דודו בוסי","Два брата":"Two Brothers Ben Elton","בנות בראון":"בנות בראון עירית לינור","גברת ורבורג":"גברת ורבורג עירית לינור","שירת הסירנה":"שירת הסירנה עירית לינור","Сто лет и чемодан денег впридачу":"The Hundred-Year-Old Man Jonas Jonasson","הזקן בן המאה ואחת שחשב שהוא חושב יותר מדי":"The Accidental Further Adventures Old Man Jonasson","Стив Джобс":"Steve Jobs Walter Isaacson biography","טווס בחדר המדרגות":"טווס בחדר המדרגות גלית דיסטל","Безмолвный пациент":"The Silent Patient Alex Michaelides","Девы":"The Maidens Alex Michaelides","איך לנצח מגפה":"איך לנצח מגפה נפתלי בנט","אישה על הנייר":"אישה על הנייר נאוה סמל","Мы":"We Yevgeny Zamyatin dystopia","קוד סמוי":"קוד סמוי יובל דרור","Убить пересмешника":"To Kill a Mockingbird Harper Lee","Нормальные люди":"Normal People Sally Rooney","Цветы для Элджернона":"Flowers for Algernon Daniel Keyes","Продавец обуви":"Shoe Dog Phil Knight","Серия лекций об исламе":"Лекции об исламе Журавский","מיומנו של פטריוט":"מיומנו של פטריוט יהונתן גפן","הרשימה":"הרשימה יובל אברמוביץ","Дэвид Копперфильд":"David Copperfield Charles Dickens","הוא משלנו":"הוא משלנו אודי אילון","הביתה הלוך חזור":"הביתה הלוך חזור אילה דקל","Атлант расправил плечи":"Atlas Shrugged Ayn Rand","Дракула":"Dracula Bram Stoker","Рассказы":"Шолом-Алейхем рассказы","סיפורה של הפוליטיקה הישראלית":"סיפורה של הפוליטיקה הישראלית עמית סגל","Шантарам":"Shantaram Gregory David Roberts","Тень горы":"The Mountain Shadow Gregory Roberts","מדריך לישראלי המתחיל":"מדריך לישראלי המתחיל ליאור שליין","Вся кремлёвская рать":"All the Kremlin's Men Mikhail Zygar","Село Степанчиково и его обитатели":"The Village of Stepanchikovo Dostoevsky","Только не без моей дочери":"Not Without My Daughter Betty Mahmoody","הדרך אליך":"הדרך אליך קרנית גולדווסר","יופי של עברית":"יופי של עברית אבשלום קור","Azazель":"The Winter Queen Boris Akunin","Азазель":"The Winter Queen Boris Akunin","Турецкий гамбит":"The Turkish Gambit Boris Akunin","Левиафан":"Leviathan Boris Akunin Fandorin","Смерть Ахиллеса":"The Death of Achilles Boris Akunin","Инь и Янь":"Yin Yang Boris Akunin","Декоратор":"The Decorator Boris Akunin","Статский советник":"The State Counsellor Boris Akunin","Коронация или последний из Романов":"Coronation Boris Akunin","Любовница смерти":"She Lover of Death Boris Akunin","Любовник смерти":"He Lover of Death Boris Akunin","Алмазная колесница":"The Diamond Chariot Boris Akunin","Весь мир театр":"All the World's a Stage Boris Akunin","Черный город":"Black City Boris Akunin","Не прощаюсь":"Not Saying Goodbye Boris Akunin","Просто Маса":"Just Masa Boris Akunin","Адвокат беса":"Devil's Advocate Boris Akunin","החנות למכשירי כתיבה בטהרן":"The Stationery Shop Tehran Kamali","לא היה כדבר הזה":"לא היה כדבר הזה נדב יעקבי","Лето в пионерском галстуке":"Лето в пионерском галстуке Сильванова","Тайная жизнь пчёл":"The Secret Life of Bees Sue Monk Kidd","Повелитель мух":"Lord of the Flies William Golding","עושים פוליטיקה":"עושים פוליטיקה דפנה ליאל","לבנון: המלחמה האבודה":"לבנון המלחמה האבודה הר זהב","השלום של טראמפ":"Trump's Peace Barak Ravid Abraham Accords","לימסול":"Limassol Yishai Sarid","ישראל השנייה":"ישראל השנייה אבישי בן חיים","Время моей жизни":"The Time of My Life Cecelia Ahern","День опричника":"Day of the Oprichnik Sorokin","אם יש גן עדן":"Beaufort Ron Leshem","כסף טוב":"כסף טוב שאול אמסטרדמסקי","זרות":"זרות ליהיא לפיד","Денискины рассказы":"Денискины рассказы Драгунский","Мемуары гейши":"Memoirs of a Geisha Arthur Golden","שלושה דברים לאי בודד":"שלושה דברים לאי בודד יואב אבני","מקלובה":"מקלובה שרי בשי","Наши очаровательные невестки":"Nos adorables belles-filles Valonh","О чём молчит Ласточка":"О чём молчит Ласточка Сильванова Малисова","איך נהייתי כזה":"איך נהייתי כזה ניר אבישי כהן","ניידים ונייחים":"ניידים ונייחים גדי טאוב","הג'ינג'י על המרפסת":"הג'ינג'י על המרפסת אפרים קישון","Холодные глаза":"Холодные глаза Ислам Ханипаев","Типа я - Дневник суперкрутого воина":"Типа я Ислам Ханипаев","יונה ונער":"A Pigeon and a Boy Meir Shalev","Жизнь - сапожок непарный":"Жизнь сапожок непарный Петкевич","Крёстный отец":"The Godfather Mario Puzo","Кремулятор":"Kremulator Sasha Filipenko","Бывший сын":"Former Son Filipenko novel Belarus","Красный крест":"Red Crosses Sasha Filipenko","Алхимик":"The Alchemist Paulo Coelho","צופן נתניהו":"צופן נתניהו מזל מועלם","Человек-зверь":"La Bete Humaine Zola","Берегись автомобиля":"Берегись автомобиля Брагинский Рязанов","Бог как иллюзия":"The God Delusion Richard Dawkins","Перебои в смерти":"Death with Interruptions Saramago","Слепота":"Blindness Jose Saramago","Скажи жизни да!":"Man's Search for Meaning Viktor Frankl","Марсианин":"The Martian Andy Weir","סמל ראשון מוסטפא רבינוביץ'":"סמל ראשון מוסטפא רבינוביץ קרביץ","המרד נגד גלובליזציה":"Revolt Nadav Eyal globalization","Интересный пациент":"Интересный пациент Ауслендер психотерапия","Похороните меня за плинтусом":"Bury Me Behind the Baseboard Sanayev","Bella Германия":"Bella Germania Daniel Speck","Piccola Сицилия":"Piccola Sicilia Daniel Speck","Улица Яффо":"Jaffa Road Daniel Speck","Йога таун":"Yoga Town Daniel Speck novel","Безнадежные войны":"Безнадежные войны Яков Казаков разведка","К северу от 38-ой параллели":"The Real North Korea Andrei Lankov","Преемник. История Бориса Немцова и страны, в которой он не стал президентом":"Преемник Немцов Фишман","Вторая чеченская":"A Small Corner of Hell Politkovskaya","Веди свой плуг по костям мертвецов":"Drive Your Plow Over the Bones of the Dead Tokarczuk","Тень":"Тень Иван Филиппов роман","Мышь":"Мышь Иван Филиппов роман","Сочувствующий":"The Sympathizer Viet Thanh Nguyen","Преданный":"The Committed Viet Thanh Nguyen","Нетаньяхуз":"The Netanyahus Joshua Cohen","Океан вне закона. Работорговля, пиратство и контрабанда в нейтральных водах":"The Outlaw Ocean Ian Urbina","Мобилизованная нация. Германия 1939–1945":"The German War Nicholas Stargardt","Знаки внимания":"Знаки внимания Лев Рубинштейн","למה כדאי להיות לטובת הכריש":"למה כדאי להיות לטובת הכריש אליאב אללוף","להיות פלסטילינה בעולם של ברגים":"להיות פלסטילינה בעולם של ברגים אללוף","Слово пацана":"Слово пацана Роберт Гараев Казань","Внутри убийцы":"Inside the Killer Mike Omer thriller","אהבה אסורה בפטרבורג":"Forbidden Love in St. Petersburg Mishka Ben-David","ביקור אחרון במוסקבה":"ביקור אחרון במוסקבה מישקה בן דוד","הכריש":"הכריש מישקה בן דוד","Шабатон":"Шабатон Алекс Тарн роман","הותר לפרסום":"הותר לפרסום ניסים משעל","Диктаторы обмана":"Spin Dictators Guriev Treisman","Йерве из Асседо":"Йерве из Асседо Вика Ройтман","Кроме шуток":"True Biz Sara Novic","Аптекарь Освенцима":"The Pharmacist of Auschwitz Patricia Posner","Чтец":"The Reader Bernhard Schlink","Тюремный дневник":"Тюремный дневник Мария Бутина","Четыре соглашения":"The Four Agreements Don Miguel Ruiz","Четыре соглашения ":"The Four Agreements Don Miguel Ruiz","Как работает пропаганда":"Как работает пропаганда Тамара Эйдельман","Стоунер":"Stoner John Williams","Идеальная няня":"The Perfect Nanny Leila Slimani","Лес":"Лес Светлана Тюльбашева","Покорность":"Submission Michel Houellebecq","Нефть и кровь":"Blood and Oil Bradley Hope Justin Scheck","За каждый метр":"За каждый метр Андрей Лисьев","Не прощаемся":"Не прощаемся Андрей Лисьев","Патриот":"Patriot Alexei Navalny memoir","ZOV 56":"ZOV Павел Филатьев","הנוסעת האחרונה":"הנוסעת האחרונה טל ניצן","Мечтатели против космонавтов":"Мечтатели против космонавтов Фельдман","Записки иноагента":"Записки иноагента Андрей Макаревич","Моя любимая страна":"I Love Russia Elena Kostyuchenko","Нексус":"Nexus Yuval Noah Harari","Всем Иран":"Всем Иран Никита Смагин","Вонгозеро":"Вонгозеро Яна Вагнер","Живые люди":"Живые люди Яна Вагнер","VZ":"VZ Дмитрий Быков роман","Долгая дорога в Тегеран":"The Slow Road to Tehran Rebecca Lowe","Царь собственной персоной":"Царь собственной персоной Баданин Рубин"};
+
+/* ====== ANNOTATIONS ====== */
+var AN={"Sapiens: Краткая история человечества":"Масштабное исследование истории человечества от каменного века до XXI века. Харари ставит под вопрос всё, что мы знаем о себе.","Homo Deus: Краткая история завтрашнего дня":"Продолжение Sapiens — взгляд в будущее: от искусственного интеллекта до бессмертия.","21 урок для XXI века":"Харари разбирает вызовы нашего времени: терроризм, технологии, фейковые новости и смысл жизни.","1984":"Культовая антиутопия о тоталитарном обществе, где Большой Брат следит за каждым. Поразительно актуальна.","Скотный двор":"Сатирическая притча о революции, которая пожирает своих детей. Свиньи устанавливают тиранию.","Анна Каренина":"Трагическая история любви на фоне русского высшего общества XIX века.","Война и мир":"Грандиозная эпопея о жизни русского общества в эпоху наполеоновских войн.","Архипелаг ГУЛАГ":"Монументальное свидетельство о системе советских лагерей. Книга, изменившая ход истории.","10 негритят":"Десять незнакомцев на острове погибают один за другим. Гениальная детективная головоломка.","Убийство в Восточном экспрессе":"Пуаро расследует убийство в застрявшем в снегу поезде. Блистательная развязка.","Вокруг света за 80 дней":"Филеас Фогг спорит, что обогнёт земной шар за 80 дней. Увлекательное путешествие.","20000 лье под водой":"Капитан Немо и подводная лодка Наутилус — одно из самых захватывающих путешествий.","Лолита":"Скандальный и гениальный роман Набокова о запретной одержимости. Шедевр стиля.","Д'Артаньян и три мушкетёра":"Приключенческий роман о дружбе и чести четырёх мушкетёров при дворе Людовика XIII.","12 стульев":"Остап Бендер ищет бриллианты в двенадцати стульях. Шедевр советской сатиры.","Мёртвые души":"Чичиков скупает мёртвые души крепостных — великая поэма Гоголя о русской жизни.","Вий":"Мистическая повесть о семинаристе, который три ночи читает молитвы над телом ведьмы.","Шинель":"Акакий Акакиевич и его мечта о новой шинели — пронзительная история о маленьком человеке.","Собачье сердце":"Профессор превращает бездомного пса в человека — блестящая сатира на советский строй.","Чемодан":"Довлатов вспоминает вещи из чемодана, с которым эмигрировал. За каждой — целая жизнь.","Робинзон Крузо":"Классическая история о выживании на необитаемом острове.","451 градус по Фаренгейту":"В будущем книги запрещены и сжигаются. Пожарный Монтэг начинает сомневаться.","Три товарища":"Трогательная история дружбы и любви в Германии между мировыми войнами.","Отцы и дети":"Конфликт поколений. Нигилист Базаров против старых ценностей.","Матрёнин двор":"О простой русской женщине Матрёне — праведнице, без которой не стоит село.","Дети капитана Гранта":"Экспедиция по 37-й параллели в поисках пропавшего капитана.","Обломов":"Философская история о барине, который предпочитает лежать и мечтать.","Граф Монте Кристо":"Невинно осуждённый Дантес сбегает из тюрьмы и мстит предателям.","Текст":"Молодой человек находит телефон убившего его жизнь полицейского. Острый триллер.","Чапаев и пустота":"Постмодернистская игра: герой мечется между Гражданской войной и 1990-ми.","Триумфальная арка":"Немецкий врач-эмигрант в Париже накануне Второй мировой. Любовь и месть.","Книги о Шерлоке Холмсе":"Полное собрание историй о великом сыщике с Бейкер-стрит.","Собор Парижской Богоматери":"Горбун Квазимодо и цыганка Эсмеральда — великий роман о средневековом Париже.","Приключения Тома Сойера":"Проделки мальчишки на берегах Миссисипи — классика американской литературы.","Приключения Гека Финна":"Гек и беглый раб Джим плывут по Миссисипи. Роман о свободе и совести.","Весь Гарри Поттер":"Полная серия о мальчике-волшебнике. Семь книг — культурный феномен поколения.","Чернобыльская молитва":"Голоса людей, переживших Чернобыль. Нобелевская премия за литературу.","Риф":"Три сюжета, связанных темой утраченной памяти. Остросоциальный роман о России.","147 свиданий":"Девушка ходит на 147 свиданий — ироничная история о современных отношениях.","Милый друг":"Обаятельный циник покоряет Париж, используя женщин как ступени к успеху.","Аэпопорт":"Снежная буря парализует аэропорт. Переплетённые судьбы в одну ночь.","Хроники заводной птицы":"Мужчина ищет пропавшего кота и попадает в лабиринт загадок Мураками.","Рассказ служанки":"Антиутопия о теократии, где женщины лишены прав. Тревожно актуально.","Побег из Шоушенка":"Банкир в тюрьме проводит десятилетия, не теряя надежды на свободу.","Письмо незнакомки":"Умирающая женщина пишет письмо мужчине, которого любила всю жизнь.","Книжный вор":"Девочка в нацистской Германии крадёт книги. Историю рассказывает Смерть.","Процесс":"Йозеф К. арестован без причин. Абсурдный и пугающий мир Кафки.","Над кукушкиным гнездом":"Макмёрфи бросает вызов жестокой системе в психиатрической больнице.","Тевье-молочник":"Мудрый Тевье в еврейском местечке. Основа мюзикла Скрипач на крыше.","И дольше века длится день":"Едигей хоронит друга в степи. Притча о памяти и забвении.","Ход королевы":"Сирота Бет Хармон становится гениальной шахматисткой, борясь с зависимостями.","Бабий яр":"Документальный роман о нацистской оккупации Киева.","Белый клык":"История волка-полусобаки на Аляске. Классика Джека Лондона.","Дневник Анны Франк":"Дневник еврейской девочки, прятавшейся от нацистов. Пронзительный документ.","Москва-2042":"Эмигрант путешествует во времени в Москву 2042 — злая сатира Войновича.","Вальс на прощание":"Несколько персонажей на чешском курорте. Кундера о случайности и судьбе.","Кровавая шутка":"Еврей и христианин меняются документами. Шолом-Алейхем о предрассудках.","Мальчик Мотл":"Весёлый мальчик Мотл о местечке и эмиграции. Грустное и смешное.","Менахем-Мендл":"Письма мечтателя жене — великая комедия Шолом-Алейхема.","Богатый папа, бедный папа":"Два подхода к деньгам: работать за зарплату или заставить деньги работать.","Всадник без головы":"Приключенческий роман о загадочном всаднике в техасских прериях.","Бегущий за ветром":"Дружба двух мальчиков в Кабуле, разрушенная предательством. Вина и искупление.","Портрет Дориана Грея":"Юноша вечно молод, а портрет стареет от грехов. Единственный роман Уайльда.","Зулейха открывает глаза":"Татарская крестьянка сослана в Сибирь. Выживание и свобода в ГУЛАГе.","Эшелон на Самарканд":"1923: эшелон везёт 500 голодных детей. Страшная и человечная история.","Код да Винчи":"Профессор Лэнгдон разгадывает тайну Леонардо. Захватывающий триллер.","Сын Хамас":"Сын основателя ХАМАС становится агентом израильской разведки.","Два брата":"Берлин 1920-30-х: близнецы по разные стороны истории. О нацизме.","Сто лет и чемодан денег впридачу":"Столетний старик сбегает из дома престарелых в серию абсурдных приключений.","Шантарам":"Сбежавший из тюрьмы австралиец в трущобах Бомбея. Эпический роман.","Тень горы":"Продолжение Шантарама. Линдсей Форд снова среди гангстеров Бомбея.","Вся кремлёвская рать":"Как устроена путинская вертикаль власти изнутри.","Село Степанчиково и его обитатели":"Ранний Достоевский: комическая история о самодуре Фоме Опискине.","Только не без моей дочери":"Американка в Иране оказывается в ловушке. Реальная история побега.","Азазель":"Первый роман о Фандорине. Молодой чиновник расследует загадочное самоубийство.","Турецкий гамбит":"Фандорин на русско-турецкой войне 1877. Шпионский детектив.","Левиафан":"Фандорин расследует убийство в Париже. Элегантный детектив.","Смерть Ахиллеса":"Фандорин в Москве расследует смерть генерала. Акунин в лучшей форме.","Инь и Янь":"Две новеллы о Фандорине в Японии. Столкновение культур.","Декоратор":"Жуткий детектив: Фандорин ловит серийного убийцу в Москве 1889.","Статский советник":"Фандорин против террористов. Политический детектив.","Коронация или последний из Романов":"Коронация Николая II и похищение наследника. Фандорин при дворе.","Любовница смерти":"Московский клуб самоубийц. Фандорин среди декадентов.","Любовник смерти":"Фандорин в трущобах среди воров. Криминальный роман.","Алмазная колесница":"Фандорин в Японии: два сюжета. Самый масштабный роман серии.","Пост":"Постапокалиптическая Россия: за мостом — мёртвая зона.","Пост. Спастись и сохранить.":"Продолжение Поста. Мир раскрывает тайны. Ещё мрачнее.","Весь мир театр":"Фандорин в театральном мире. Убийство на сцене.","Черный город":"Фандорин в Баку 1914: нефть, революционеры и война.","Не прощаюсь":"Последний Фандорин. 1918, Гражданская война разрушает мир.","Просто Маса":"Приключения верного японского слуги Фандорина.","Ночь в Лиссабоне":"Эмигрант рассказывает свою историю в обмен на билет на корабль.","Лето в пионерском галстуке":"Первая любовь двух мальчиков в советском пионерлагере.","Тарас Бульба":"Казачий атаман и его сыновья: слава, предательство и война.","Тайная жизнь пчёл":"Девочка с Юга ищет правду о матери у сестёр-пчеловодов.","Повелитель мух":"Мальчики на острове строят общество — и оно скатывается в дикость.","День опричника":"Россия 2028: опричники наводят порядок. Мрачная сатира Сорокина.","Записки юного врача":"Молодой врач в глухой деревне: смешные и трагические истории.","Денискины рассказы":"Весёлые истории про мальчика Дениску — любимая книга поколений.","Мемуары гейши":"Девочка становится гейшей в Киото 1930-х. Красивый и экзотический мир.","О чём молчит Ласточка":"Продолжение Лета в пионерском галстуке. Герои встречаются спустя годы.","На западном фронте без перемен":"Немецкие солдаты в окопах Первой мировой. Мощный антивоенный роман.","Холодные глаза":"Дагестанский мальчик пишет письма матери. Пронзительный роман о детстве.","Типа я - Дневник суперкрутого воина":"Дневник дагестанского подростка — смешной и трогательный.","Жизнь - сапожок непарный":"Мемуары актрисы, прошедшей ГУЛАГ. Потрясающее свидетельство силы духа.","Крёстный отец":"Семья Корлеоне: великий роман о мафии и семейных ценностях.","Кремулятор":"Человек в крематории репрессий. Филипенко о памяти и забвении.","Рассказы о Родине":"Сатирические и страшные рассказы о российской действительности.","Алхимик":"Пастух Сантьяго за мечтой в Египет. Притча о предназначении.","Человек-зверь":"Железнодорожный роман Золя: страсть, безумие и убийство.","Берегись автомобиля":"Скромный служащий угоняет машины у жуликов. Любимая советская комедия.","Бог как иллюзия":"Докинз доказывает, почему Бога, вероятно, нет. Провокационная книга.","Перебои в смерти":"Люди перестают умирать. Сарамаго о последствиях бессмертия.","Слепота":"Эпидемия слепоты в городе. Сарамаго о хрупкости цивилизации.","Скажи жизни да!":"Франкл об Освенциме и о том, как найти смысл даже в страдании.","Марсианин":"Астронавт застрял на Марсе и выживает наукой и юмором.","Интересный пациент":"Занимательные случаи из психотерапевтической практики.","Похороните меня за плинтусом":"Мальчик с деспотичной бабушкой. Смешная и страшная автобиография.","Bella Германия":"Итальянская семья в Германии: три поколения и семейные тайны.","Piccola Сицилия":"Тунис во Второй мировой: любовь и выживание.","Улица Яффо":"Израиль и Германия: семейные тайны, связывающие два мира.","Безнадежные войны":"Мемуары израильского разведчика о войнах и спецоперациях.","Нексус":"Новый Харари о сетях информации от мифов до алгоритмов.","Всем Иран":"Журналист об Иране изнутри: жизнь, политика и культура.","Вонгозеро":"Эпидемия в России, семья бежит к озеру. Постапокалиптический триллер.","Живые люди":"Продолжение Вонгозера. Выжившие строят новый мир.","Время моей жизни":"Жизнь Люси рушится, и жизнь сама вызывает её на разговор.","Стоунер":"Тихая жизнь профессора. Заново открытый шедевр.","Идеальная няня":"Няня убивает детей. Психологический триллер по реальным событиям.","Лес":"Российская антиутопия о городе, окружённом непроходимым лесом.","Покорность":"Франция выбирает президента-мусульманина. Провокационная антиутопия.","Красный крест":"История старушки из ГУЛАГа и молодого минчанина.","Нефть и кровь":"Расследование о наследном принце Саудовской Аравии и убийстве журналиста.","Патриот":"Автобиография Навального — от детства до борьбы с коррупцией.","VZ":"Роман Быкова о современной России через абсурд и литературу.","Долгая дорога в Тегеран":"На велосипеде по Ирану — удивительные встречи и открытия.","Великий преемник...":"Биография Ким Чен Ына — наследника северокорейской династии.","Великий преемник. Божественно совершенная судьба выдающегося товарища Ким Чен Ына":"Биография Ким Чен Ына — наследника северокорейской династии.","Рассказы":"Шокирующие и абсурдные рассказы Сорокина.","Царь собственной персоной":"Расследование о Путине: как строилась вертикаль власти.","Йога таун":"Индия, йога и поиск себя. Новый Шпек.","Мечтатели против космонавтов":"О столкновении мечтателей-идеалистов с реальностью.","Записки иноагента":"Макаревич о жизни в эмиграции и статусе иноагента.","Моя любимая страна":"Журналистка о России, которую любит и за которую борется.","Безмолвный пациент":"Художница стреляет в мужа и замолкает навсегда. Захватывающий триллер.","Тысяча сияющих солнц":"Судьбы двух афганских женщин на фоне войн. Пронзительно.","Девы":"Групповая терапия скрывает зловещую тайну. Второй триллер Михаэлидеса.","Нормальные люди":"Она и он в Ирландии: сложная любовь от школы до университета.","Цветы для Элджернона":"Умственно отсталый Чарли становится гением — и теряет всё.","Продавец обуви":"Как Фил Найт построил Nike. Вдохновляющая бизнес-история.","Стив Джобс":"Авторизованная биография создателя Apple. Гений и тиран.","Дэвид Копперфильд":"Автобиографический роман Диккенса: от бедного сироты до писателя.","Камера обскура":"Трагическая история слепой любви. Ранний Набоков.","Атлант расправил плечи":"Философский роман Рэнд: что будет, если лучшие умы объявят забастовку.","Воскресение":"Последний роман Толстого: князь пытается искупить вину перед соблазнённой девушкой.","Дракула":"Классический готический роман о самом знаменитом вампире.","Зелёная миля":"Чудотворный заключённый в камере смертников. Кинг в лучшей форме.","Мы":"Первая великая антиутопия XX века. Вдохновила Оруэлла и Хаксли.","Убить пересмешника":"Адвокат защищает чернокожего в расистском городке. Классика.","Один день Ивана Денисовича":"Один день в лагере — и вся правда о системе. Книга-бомба.","Наши очаровательные невестки":"Французская семейная комедия о свекрови и невестках.","Защита Лужина":"Шахматный гений теряет связь с реальностью. Набоков о безумии.","Океан вне закона. Работорговля, пиратство и контрабанда в нейтральных водах":"Расследование о беззаконии в мировом океане: пиратство, рабство и контрабанда.","Мобилизованная нация. Германия 1939–1945":"Как обычные немцы жили и воевали при нацизме. Масштабное исследование.","Знаки внимания":"Поэтические миниатюры Рубинштейна — наблюдения за жизнью и языком.","Слово пацана":"История казанских уличных группировок 1980-90-х. Документальный бестселлер.","Внутри убийцы":"Профайлер ФБР анализирует сознание серийных убийц. Захватывающий триллер.","Шабатон":"Роман о жизни репатриантов в Израиле — между двумя мирами.","Диктаторы обмана":"Как современные автократы удерживают власть не страхом, а манипуляцией.","Йерве из Асседо":"Фантастическая история с философским подтекстом.","Кроме шуток":"Роман о глухой девушке, раскрывающий мир людей с инвалидностью.","Бывший сын":"Молодой белорус в коме просыпается в другой стране. Филипенко о судьбе.","Аптекарь Освенцима":"Реальная история аптекаря, работавшего в лагере смерти.","Мышь":"Психологический триллер о манипуляциях и контроле.","Чтец":"Подросток и бывшая надзирательница концлагеря. Роман о вине и памяти.","Тюремный дневник":"Записки Марии Бутиной из американской тюрьмы. Взгляд изнутри.","Четыре соглашения":"Древняя мудрость тольтеков о четырёх принципах свободной жизни.","Как работает пропаганда":"Историк Эйдельман разбирает механизмы пропаганды от древности до наших дней.","Адвокат беса":"Фандорин сталкивается с гениальным злодеем. Акунин в новом формате.","Тень":"Мрачный российский триллер о теневой стороне власти.","Сочувствующий":"Двойной агент во время Вьетнамской войны. Пулитцеровская премия.","Нетаньяхуз":"Семья израильского историка принимает в гости семью Нетаньяху. Пулитцер.","Преданный":"Продолжение Сочувствующего. Шпион в Париже после войны.","К северу от 38-ой параллели":"Востоковед Ланьков о повседневной жизни в Северной Корее.","Преемник. История Бориса Немцова и страны, в которой он не стал президентом":"Биография Немцова и история упущенного шанса России.","Вторая чеченская":"Политковская о войне в Чечне. Бесстрашная журналистика.","Веди свой плуг по костям мертвецов":"Эксцентричная женщина расследует загадочные убийства. Нобелевская лауреатка.","Серия лекций об исламе":"Академический цикл лекций об истории и культуре ислама.","Памяти Каталонии":"Оруэлл о Гражданской войне в Испании — личный опыт на фронте.","За каждый метр":"Рассказ о войне и борьбе за каждый метр земли.","Не прощаемся":"Продолжение военной прозы Лисьева о судьбах людей на войне.","ZOV 56":"Дневник российского десантника, ушедшего с войны. Свидетельство очевидца.","קוספא שחורה":"סיפור אהבה וחוסר תקשורת בין בני זוג בירושלים. אחד הרומנים המשמעותיים של עמוס עוז.","פימה":"פימה הוא אינטלקטואל ירושלמי כושל שחייו נפרמים. רומן הומוריסטי ועצוב.","מיכאל שלי":"חנה גונן מספרת על נישואיה ועל חלומותיה. יצירת מופת של עמוס עוז.","יהודה":"סיפור על בגידה, אהבה ואמונה בירושלים של שנות ה-60.","שליחותו של הממונה על משאבי אנוש":"מנהל משאבי אנוש יוצא למסע מוזר לאחר מות עובדת זרה.","גדר חיה":"סיפור אהבה בין ישראלית לפלסטיני בניו יורק. עורר סערה בישראל.","על עקבים במזרח התיכון":"עיתונאית ישראלית מסקרת את המזרח התיכון מנקודת מבט ייחודית.","איתי החיים משחק הרבה":"שלושה דורות של נשים ישראליות. רומן מרגש של גרוסמן.","פני השטח":"מותחן ישראלי מרתק על מה שמתחבא מתחת לפני השטח.","מישהו לרוץ איתו":"נער ונערה מחפשים כלב ברחובות ירושלים. יצירת מופת של גרוסמן.","שלושה ימים וילד":"סיפור מתוח על גבר שמטפל בילד של אהובתו לשעבר.","נתניהו - ביוגרפיה":"הביוגרפיה המקיפה של בנימין נתניהו מאת בן כספית.","ארץ איומה":"אמריקאי ממוצא רוסי חוזר לרוסיה ומגלה עולם זר ומוכר.","האיש שלנו בווהאן":"סיפור ריגול ישראלי בווהאן בזמן מגפת הקורונה.","המנהרה":"יהושע בשיא כוחו: רומן על מנהרה נחפרת מתחת לירושלים.","סוס אחד נכנס לבר":"קומיקאי בהופעה אחרונה מספר את סיפור חייו. גרוסמן מרגש.","ארבעה בתים וגעגוע":"ארבעה סיפורים על ישראלים מחפשי משמעות. אשכול נבו במיטבו.","תקוות שחורות":"סיפור על חוויות ותקוות בישראל. זהבי בפרוזה חדה.","מרן - הרב עובדיה יוסף":"ביוגרפיה מרתקת של המנהיג הרוחני של יהדות המזרח.","עקוב אחר השינויים":"קשוע על זהות ערבית-ישראלית בהומור ובכאב.","פרא אציל":"סיפור ישראלי על חיים, אהבה ומורכבות.","בנות בראון":"לינור על נשים ישראליות בפרוזה חדה ומצחיקה.","גברת ורבורג":"רומן היסטורי מרתק על משפחה ירושלמית.","ויהי בוקר":"כפר ערבי מוקף חומה. קשוע על האבסורד הישראלי.","שירת הסירנה":"רומן הביכורים של לינור — חד, מצחיק וכואב.","מדריך לישראלי המתחיל":"שליין מסביר את ישראל בהומור חכם ומדויק.","הדרך אליך":"קרנית גולדווסר על חטיפת בעלה והמאבק לשחררו.","יופי של עברית":"אבשלום קור על יופיה ומורכבותה של השפה העברית.","החנות למכשירי כתיבה בטהרן":"סיפור אהבה על רקע המהפכה האיראנית. רומנטי ומרגש.","הזקן בן המאה ואחת שחשב שהוא חושב יותר מדי":"המשך הרפתקאותיו של הזקן השוודי — הומור אבסורדי.","לא היה כדבר הזה":"סיפור ישראלי מרתק ומקורי.","עושים פוליטיקה":"דפנה ליאל מגלה מה קורה מאחורי הקלעים של הפוליטיקה.","לבנון: המלחמה האבודה":"סיפור מלחמת לבנון מנקודת מבט חדשה.","השלום של טראמפ":"ברק רביד חושף את הסכמי אברהם מאחורי הקלעים.","לימסול":"מותחן ישראלי על סוכן שב\"כ במשימה בלימסול.","ישראל השנייה":"מבט על פערים חברתיים וזהותיים בחברה הישראלית.","אם יש גן עדן":"רון לשם על מלחמת לבנון — אחד הספרים הטובים על החוויה הצבאית.","כסף טוב":"סיפור על עולם הכסף והעסקים בישראל.","זרות":"ליהיא לפיד על ניכור וזרות בחיים המודרניים.","שלושה דברים לאי בודד":"יואב אבני מספר סיפורים על ישראלים.","מקלובה":"סיפור משפחתי על רקע הכפר הערבי. בישול, זיכרונות ומשפחה.","איך נהייתי כזה":"ניר אבישי כהן מספר את סיפורו — מצחיק ומרגש.","ניידים ונייחים":"גדי טאוב על החלוקה בין ניידים לנייחים בחברה.","הג'ינג'י על המרפסת":"קישון בהומור ישראלי קלאסי — סיפורים מצחיקים.","יונה ונער":"מאיר שלו על אהבה, מלחמה ויונות. רומן ישראלי מרגש.","צופן נתניהו":"חשיפת הקוד של נתניהו — איך הוא שולט ומנהל.","סמל ראשון מוסטפא רבינוביץ'":"סיפור מצחיק ומרגש על דרוזי בצבא הישראלי.","המרד נגד גלובליזציה":"נדב איל על הגל הפופוליסטי שמשנה את העולם.","לב רעב":"אשכול נבו על אנשים רעבים לאהבה ולמשמעות.","נוכחים נפקדים":"גרוסמן על חיי הפלסטינים תחת כיבוש.","הנוסעת האחרונה":"מותחן ישראלי מרתק על נוסעת ברכבת.","איך לנצח מגפה":"נפתלי בנט על ניהול משבר הקורונה בישראל מנקודת מבטו.","הראיון האחרון":"אשכול נבו על מפגש אחרון שמשנה הכול.","צימר בגבעתיים":"זוגות ישראלים במשבר. נבו על אהבה ושגרה.","נוילנד":"ישראלים מחפשים חיים חדשים בארץ דמיונית.","שלוש קומות":"שלושה סיפורים בשלוש קומות של בניין — נבו על השכנים שלנו.","גבר נכנס בפרדס":"גבר בפרדס — נבו על חיפוש רוחני ומשמעות.","אישה על הנייר":"נאוה סמל על זהות נשית וכתיבה.","קוד סמוי":"מותחן ישראלי על קודים וסודות.","מיומנו של פטריוט":"יהונתן גפן ביומן אישי ופוליטי.","משאלה אחת ימינה":"נבו על משאלות, חלומות וישראל.","הרשימה":"יובל אברמוביץ' ברומן מרתק על רשימות וגורל.","הוא משלנו":"אודי אילון על עולם הביון והמודיעין הישראלי.","פנתר במרתף":"עמוס עוז בילדותו הירושלמית — סיפור על דמיון ומציאות.","הביתה הלוך חזור":"אילה דקל על מסע הביתה ומה שמחכה שם.","סיפורה של הפוליטיקה הישראלית":"עמית סגל מספר את סיפור הפוליטיקה מבפנים.","הותר לפרסום":"ניסים משעל חושף סיפורים שלא פורסמו.","אהבה אסורה בפטרבורג":"סיפור ריגול ורומנטיקה ברוסיה של מישקה בן דוד.","ביקור אחרון במוסקבה":"מותחן ריגול ישראלי ברוסיה.","הכריש":"מישקה בן דוד במותחן ריגול מרתק.","למה כדאי להיות לטובת הכריש":"אליאב אללוף על חשיבה אחרת ונקודות מבט מפתיעות.","להיות פלסטילינה בעולם של ברגים":"אללוף על גמישות ושרידות בעולם קשוח.","טווס בחדר המדרגות":"גלית דיסטל אטבריאן על חיים ישראליים מורכבים.","המקווה האחרון בסיביר":"נבו על מסע לסיביר ועל שורשים יהודיים."};
+
+
+/* ====== HARDCODED COVERS ====== */
+var HC={"1984":"https://cdn.ast.ru/v2/AST000000000130417/COVER/cover1__w600.jpg"};
+
+/* ====== USER COVERS (IndexedDB) ====== */
+var ucDB=null,ucCache={},UC_DB='bklib_covers_db',UC_STORE='covers';
+function openUCDB(){return new Promise(function(resolve,reject){if(ucDB){resolve(ucDB);return}var req=indexedDB.open(UC_DB,1);req.onupgradeneeded=function(e){e.target.result.createObjectStore(UC_STORE)};req.onsuccess=function(e){ucDB=e.target.result;resolve(ucDB)};req.onerror=function(){reject()}})}
+function loadAllUC(){return openUCDB().then(function(db){return new Promise(function(resolve){var tx=db.transaction(UC_STORE,'readonly');var st=tx.objectStore(UC_STORE);var req=st.getAll();var reqK=st.getAllKeys();var vals,keys;req.onsuccess=function(){vals=req.result};reqK.onsuccess=function(){keys=reqK.result};tx.oncomplete=function(){for(var i=0;i<keys.length;i++)ucCache[keys[i]]=vals[i];resolve(ucCache)};tx.onerror=function(){resolve(ucCache)}})})}
+function setUC(title,dataURL){var k=title.trim().toLowerCase();ucCache[k]=dataURL;return openUCDB().then(function(db){return new Promise(function(resolve,reject){var tx=db.transaction(UC_STORE,'readwrite');tx.objectStore(UC_STORE).put(dataURL,k);tx.oncomplete=function(){resolve(true)};tx.onerror=function(){reject(tx.error)}})})}
+function hasUC(title){return ucCache[title.trim().toLowerCase()]||null}
+function uploadCover(title,img){var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){var file=inp.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(){var image=new Image();image.onload=function(){var cvs=document.createElement('canvas');var maxW=400,w=image.width,h=image.height;if(w>maxW){h=Math.round(h*(maxW/w));w=maxW}cvs.width=w;cvs.height=h;var ctx=cvs.getContext('2d');ctx.drawImage(image,0,0,w,h);var dataURL=cvs.toDataURL('image/jpeg',0.82);setUC(title,dataURL).then(function(){showCov(img,dataURL);showSaveOk(img)}).catch(function(){alert('Ошибка сохранения обложки!')})};image.src=reader.result};reader.readAsDataURL(file)};inp.click()}
+function showSaveOk(img){var card=img.closest('.book-card');if(!card)return;var dot=document.createElement('div');dot.style.cssText='position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:13px;font-weight:600;padding:4px 14px;border-radius:12px;z-index:70;pointer-events:none;transition:opacity .5s';dot.textContent='✓ Сохранено';card.appendChild(dot);setTimeout(function(){dot.style.opacity='0';setTimeout(function(){dot.remove()},500)},1500)}
+
+/* ====== COVER CACHE ====== */
+var CCK='bklib_cov_v7',CCE=7*864e5;
+function gcc(){try{var r=localStorage.getItem(CCK);if(!r)return{};var c=JSON.parse(r),n=Date.now();for(var k in c)if(n-c[k].t>CCE)delete c[k];return c}catch(e){return{}}}
+function scc(c){try{localStorage.setItem(CCK,JSON.stringify(c))}catch(e){}}
+var cq=[],cqr=false;
+function eqc(title,img){var uc=hasUC(title);if(uc){showCov(img,uc);return}var c=gcc(),k=title.trim().toLowerCase();if(c[k]){if(c[k].u){img.src=c[k].u;img.style.display='block';var ph=img.parentElement.querySelector('.c-ph');if(ph)ph.style.display='none'}return}cq.push({title:title,key:k,img:img});if(!cqr)pcq()}
+async function pcq(){cqr=true;while(cq.length>0){var it=cq.shift();await fc(it.title,it.key,it.img);await new Promise(function(r){setTimeout(r,80)})}cqr=false}
+function showCov(img,u){img.src=u;img.style.display='block';var ph=img.parentElement.querySelector('.c-ph');if(ph)ph.style.display='none'}
+async function gbq(q){try{var r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=3');var d=await r.json();if(d.items){for(var i=0;i<d.items.length;i++){var il=d.items[i].volumeInfo&&d.items[i].volumeInfo.imageLinks;if(il&&il.thumbnail){var u=il.thumbnail.replace('http://','https://').replace('&edge=curl','').replace('zoom=1','zoom=2');return u}}}return null}catch(e){return null}}
+async function olq(q){try{var r=await fetch('https://openlibrary.org/search.json?q='+encodeURIComponent(q)+'&limit=3&fields=cover_i,title,author_name');var d=await r.json();if(d.docs){for(var i=0;i<d.docs.length;i++){if(d.docs[i].cover_i){return'https://covers.openlibrary.org/b/id/'+d.docs[i].cover_i+'-M.jpg'}}}return null}catch(e){return null}}
+async function fc(title,key,img){var uc=hasUC(title);if(uc){showCov(img,uc);return}var tt=title.trim();var hc=HC[tt];if(hc){var c=gcc();c[key]={u:hc,t:Date.now()};scc(c);showCov(img,hc);return}var q=TM[title]||TM[tt]||title;var u=await gbq(q);if(!u&&q!==tt)u=await gbq(tt);if(!u)u=await olq(q);if(!u&&q!==tt)u=await olq(tt);var c=gcc();c[key]={u:u,t:Date.now()};scc(c);if(u)showCov(img,u)}
+
+/* ====== DURATION PARSER ====== */
+function pd(cell){
+if(!cell)return 0;
+var s=cell.f||'',v=cell.v;
+if(s){s=s.trim();var h3=s.match(/^(\d+):(\d+):(\d+)$/);if(h3)return parseInt(h3[1])+parseInt(h3[2])/60+parseInt(h3[3])/3600;var h2=s.match(/^(\d+):(\d+)$/);if(h2)return parseInt(h2[1])+parseInt(h2[2])/60}
+if(Array.isArray(v))return(v[0]||0)+(v[1]||0)/60+(v[2]||0)/3600;
+if(typeof v==='string'&&v.indexOf('Date(')===0){var m=v.match(/Date\(\d+,\d+,\d+,(\d+),(\d+),(\d+)\)/);if(m)return parseInt(m[1])+parseInt(m[2])/60+parseInt(m[3])/3600}
+if(typeof v==='string'){v=v.trim();var h3b=v.match(/^(\d+):(\d+):(\d+)$/);if(h3b)return parseInt(h3b[1])+parseInt(h3b[2])/60+parseInt(h3b[3])/3600;var h2b=v.match(/^(\d+):(\d+)$/);if(h2b)return parseInt(h2b[1])+parseInt(h2b[2])/60}
+if(typeof v==='number')return v;
+return 0}
+
+function fdd(h){if(!h||h===0)return'';var hr=Math.floor(h),mn=Math.round((h-hr)*60);if(hr===0)return mn+' мин';if(mn===0)return hr+' ч';return hr+' ч '+mn+' мин'}
+
+/* ====== STARS ====== */
+function stH(rat){
+var s5=rat/2,h='';
+for(var i=1;i<=5;i++){
+if(i<=Math.floor(s5))h+='<svg class="sf" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+else if(i-0.5<=s5)h+='<svg class="sf" viewBox="0 0 24 24" fill="currentColor" opacity="0.6"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+else h+='<svg class="se" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'}
+return h}
+
+/* ====== MAIN ====== */
+var AB=[];
+
+var curFiltered=[];
+
+function handleSheetData(resp){
+var rows=resp.table.rows;AB=[];
+for(var i=0;i<rows.length;i++){
+var row=rows[i];
+if(!row.c||!row.c[0]||!row.c[0].v)continue;
+var title=String(row.c[0].v).trim();
+var author=(row.c[1]&&row.c[1].v)?String(row.c[1].v).trim():'';
+var yr=row.c[2]?row.c[2].v:null;
+var year=yr?parseInt(yr):null;
+var rr=row.c[3]?row.c[3].v:null;
+var rating=rr?parseFloat(rr):0;
+var dur=pd(row.c[4]||null);
+AB.push({title:title,author:author,year:year,rating:rating,dur:dur})}
+document.getElementById('loading').style.display='none';
+rStats();populateYears();
+document.getElementById('ctrls').style.display='flex';
+document.getElementById('bgrid').style.display='grid';
+document.getElementById('ftr').style.display='block';
+loadAllUC().then(function(){rBooks()}).catch(function(){rBooks()})}
+
+function rStats(){
+var tb=AB.length,th=0,tr=0;
+for(var i=0;i<AB.length;i++){th+=AB[i].dur;tr+=AB[i].rating}
+var ar=tb?tr/tb:0;
+var ua=new Set();for(var i=0;i<AB.length;i++)ua.add(AB[i].author);
+aN('st-b',tb);aN('st-h',Math.round(th));
+document.getElementById('st-r').innerHTML=ar.toFixed(1)+'<span class="ac">/10</span>';
+aN('st-a',ua.size);
+document.getElementById('fb').textContent=tb;
+document.getElementById('fh').textContent=Math.round(th).toLocaleString();
+document.getElementById('fd').textContent=(th/24).toFixed(1)}
+
+function aN(id,tgt){
+var el=document.getElementById(id),dur=1500,st=performance.now();
+function up(ct){var p=Math.min((ct-st)/dur,1);var e=1-Math.pow(1-p,3);el.textContent=Math.round(tgt*e).toLocaleString();if(p<1)requestAnimationFrame(up)}
+requestAnimationFrame(up)}
+
+/* ====== POPULATE YEAR FILTER ====== */
+function populateYears(){
+var ys=new Set();for(var i=0;i<AB.length;i++)if(AB[i].year)ys.add(AB[i].year);
+var arr=Array.from(ys).sort(function(a,b){return b-a});
+var sel=document.getElementById('yfil');
+for(var i=0;i<arr.length;i++){var o=document.createElement('option');o.value=arr[i];o.textContent=arr[i];sel.appendChild(o)}}
+
+/* ====== BOOK RENDERING ====== */
+var cardObserver=null;
+function initObserver(){
+if(cardObserver)return;
+if(!('IntersectionObserver' in window))return;
+cardObserver=new IntersectionObserver(function(entries){
+for(var i=0;i<entries.length;i++){
+if(entries[i].isIntersecting){entries[i].target.classList.remove('bc-hidden');entries[i].target.classList.add('bc-visible');cardObserver.unobserve(entries[i].target)}}
+},{threshold:0.1,rootMargin:'50px'})}
+
+function rBooks(){
+var search=document.getElementById('sinp').value.toLowerCase();
+var rf=document.getElementById('rfil').value;
+var yf=document.getElementById('yfil').value;
+var sb=document.getElementById('ssrt').value;
+var f=[];
+for(var i=0;i<AB.length;i++){var b=AB[i];
+var ms=!search||b.title.toLowerCase().indexOf(search)>=0||b.author.toLowerCase().indexOf(search)>=0;
+var mr=true;
+if(rf==='low')mr=b.rating<=5;
+else if(rf!=='all')mr=b.rating>=parseInt(rf);
+var my=yf==='all'||b.year==parseInt(yf);
+if(ms&&mr&&my)f.push(b)}
+f.sort(function(a,b){
+switch(sb){
+case'rating-desc':return b.rating-a.rating||a.title.localeCompare(b.title);
+case'rating-asc':return a.rating-b.rating||a.title.localeCompare(b.title);
+case'title':return a.title.localeCompare(b.title);
+case'author':return a.author.localeCompare(b.author);
+case'year-desc':return(b.year||0)-(a.year||0);
+case'year-asc':return(a.year||9999)-(b.year||9999);
+case'duration-desc':return b.dur-a.dur;
+case'duration-asc':return a.dur-b.dur;
+default:return 0}});
+curFiltered=f;
+document.getElementById('shcnt').textContent=f.length;
+var g=document.getElementById('bgrid');g.innerHTML='';
+if(f.length===0){g.innerHTML='<div class="no-res"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 11h6"/></svg><h3>Ничего не найдено</h3><p>Попробуйте изменить параметры поиска</p></div>';return}
+initObserver();
+for(var i=0;i<f.length;i++){
+var b=f[i],c=document.createElement('div');c.className='book-card bc-hidden';
+c.style.animationDelay=Math.min(i*0.04,1.2)+'s';
+var ann=AN[b.title]||'',ds=fdd(b.dur),ys=b.year?b.year:'';
+c.innerHTML='<button class="b-upl" title="Загрузить обложку"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>'+
+(ann?'<div class="b-ann">'+ann+'</div>':'')+
+'<div class="book-cover"><div class="c-ph"><svg class="phi" viewBox="0 0 24 24" fill="none" stroke="#9B9590" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="pht">'+b.title+'</span></div><img style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" alt="'+b.title+'"><div class="brb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'+b.rating+'</div></div>'+
+'<div class="b-info"><div class="b-title">'+b.title+'</div><div class="b-author">'+b.author+'</div><div class="b-meta"><div class="b-stars">'+stH(b.rating)+'</div><span class="b-dur">'+ds+'</span></div>'+(ys?'<div class="b-year">'+ys+'</div>':'')+'</div>';
+g.appendChild(c);
+if(cardObserver)cardObserver.observe(c);else{c.classList.remove('bc-hidden');c.classList.add('bc-visible')}
+var covImg=c.querySelector('.book-cover img');
+eqc(b.title,covImg);
+(function(book,title,img,card){
+var btn=card.querySelector('.b-upl');
+if(btn)btn.addEventListener('click',function(e){e.stopPropagation();uploadCover(title,img)});
+card.addEventListener('click',function(){openModal(book,img.src,img.style.display!=='none')})
+})(b,b.title,covImg,c)}}
+
+/* ====== MODAL ====== */
+function openModal(book,coverSrc,hasCover){
+var m=document.getElementById('modal');
+document.getElementById('m-title').textContent=book.title;
+document.getElementById('m-author').textContent=book.author;
+var mimg=document.getElementById('m-cover');
+var mph=document.getElementById('m-ph');
+var mpht=document.getElementById('m-ph-t');
+if(hasCover&&coverSrc){mimg.src=coverSrc;mimg.style.display='block';mph.style.display='none'}
+else{mimg.style.display='none';mph.style.display='flex';mpht.textContent=book.title}
+var chips='';
+if(book.year)chips+='<span class="m-chip">'+book.year+'</span>';
+chips+='<span class="m-chip"><svg viewBox="0 0 24 24" fill="currentColor" style="color:#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'+book.rating+'</span>';
+if(book.dur)chips+='<span class="m-chip">'+fdd(book.dur)+'</span>';
+document.getElementById('m-meta').innerHTML=chips;
+var ann=AN[book.title]||'';
+document.getElementById('m-ann').textContent=ann;
+document.getElementById('m-ann').style.display=ann?'block':'none';
+m.classList.add('active');
+document.body.style.overflow='hidden'}
+
+function closeModal(){
+document.getElementById('modal').classList.remove('active');
+document.body.style.overflow=''}
+
+document.getElementById('modal-close').addEventListener('click',closeModal);
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+
+/* ====== EXPORT ====== */
+function exportCSV(){
+var rows=['Название;Автор;Год;Рейтинг;Длительность'];
+var data=curFiltered.length?curFiltered:AB;
+for(var i=0;i<data.length;i++){
+var b=data[i];
+rows.push('"'+b.title.replace(/"/g,'""')+'";"'+b.author.replace(/"/g,'""')+'";"'+(b.year||'')+'";"'+b.rating+'";"'+fdd(b.dur)+'"')}
+var csv='\uFEFF'+rows.join('\n');
+var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+var url=URL.createObjectURL(blob);
+var a=document.createElement('a');a.href=url;a.download='my_library.csv';a.click();
+URL.revokeObjectURL(url);
+document.getElementById('exp-dd').classList.remove('active')}
+
+function exportPrint(){
+document.getElementById('exp-dd').classList.remove('active');
+var data=curFiltered.length?curFiltered:AB;
+var w=window.open('','_blank');
+var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Моя библиотека</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#1a1a1a}h1{font-size:1.5rem;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:.85rem}th,td{border:1px solid #ddd;padding:8px 10px;text-align:left}th{background:#f5f0eb;font-weight:600}tr:nth-child(even){background:#fafaf8}.r{text-align:center}.d{white-space:nowrap}@media print{body{padding:10px}}</style></head><body>';
+html+='<h1>Моя библиотека — '+data.length+' книг</h1>';
+html+='<table><thead><tr><th>#</th><th>Название</th><th>Автор</th><th>Год</th><th class="r">Рейтинг</th><th class="d">Длительность</th></tr></thead><tbody>';
+for(var i=0;i<data.length;i++){
+var b=data[i];
+html+='<tr><td>'+(i+1)+'</td><td>'+b.title+'</td><td>'+b.author+'</td><td>'+(b.year||'')+'</td><td class="r">'+b.rating+'</td><td class="d">'+fdd(b.dur)+'</td></tr>'}
+html+='</tbody></table></body></html>';
+w.document.write(html);w.document.close();
+setTimeout(function(){w.print()},300)}
+
+/* ====== EVENT LISTENERS ====== */
+var stt;
+document.getElementById('sinp').addEventListener('input',function(){clearTimeout(stt);stt=setTimeout(rBooks,200)});
+document.getElementById('rfil').addEventListener('change',rBooks);
+document.getElementById('yfil').addEventListener('change',rBooks);
+document.getElementById('ssrt').addEventListener('change',rBooks);
+
+document.getElementById('exp-btn').addEventListener('click',function(e){
+e.stopPropagation();
+document.getElementById('exp-dd').classList.toggle('active')});
+document.addEventListener('click',function(){document.getElementById('exp-dd').classList.remove('active')});
+
+/* ====== MIGRATE OLD LOCALSTORAGE COVERS TO INDEXEDDB ====== */
+(function(){try{var old=localStorage.getItem('bklib_user_cov');if(old){var data=JSON.parse(old);var keys=Object.keys(data);if(keys.length>0){openUCDB().then(function(db){var tx=db.transaction(UC_STORE,'readwrite');var st=tx.objectStore(UC_STORE);for(var i=0;i<keys.length;i++){ucCache[keys[i]]=data[keys[i]];st.put(data[keys[i]],keys[i])}tx.oncomplete=function(){localStorage.removeItem('bklib_user_cov')}})}}}catch(e){}})();
+
+/* ====== LOAD VIA JSONP ====== */
+(function(){
+var sid='1QN33Kzrfc-ErWGPpPua8KGNRgn840t3e78XAs2PogAQ';
+var url='https://docs.google.com/spreadsheets/d/'+sid+'/gviz/tq?tqx=responseHandler:handleSheetData';
+var s=document.createElement('script');s.src=url;
+s.onerror=function(){document.getElementById('loading').innerHTML='<div style="color:var(--accent);font-size:1.1rem"><p>Не удалось загрузить данные.</p><p style="font-size:.9rem;color:var(--text-mut);margin-top:8px">Проверьте интернет и перезагрузите страницу.</p></div>'};
+document.head.appendChild(s)})();
+
+/* ====== SERVICE WORKER ====== */
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
+</script>
+</body>
+</html>
