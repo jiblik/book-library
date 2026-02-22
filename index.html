@@ -58,6 +58,17 @@ h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
 .export-dd button{display:flex;align-items:center;gap:8px;width:100%;padding:11px 16px;border:none;background:none;font-size:.84rem;font-family:inherit;color:var(--text);cursor:pointer;transition:background .15s}
 .export-dd button:hover{background:var(--accent-light)}
 .export-dd button svg{width:14px;height:14px;color:var(--text-mut)}
+.cov-mgr{position:relative}
+.cov-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);border-radius:var(--r);font-size:0;background:var(--bg-card);cursor:pointer;transition:border-color .2s,background .2s;padding:0}
+.cov-btn:hover{border-color:var(--accent);background:var(--accent-light)}
+.cov-btn svg{width:18px;height:18px;color:var(--text-sec);transition:color .2s}
+.cov-btn:hover svg{color:var(--accent)}
+.cov-dd{position:absolute;top:100%;right:0;margin-top:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--sh-lg);display:none;z-index:100;min-width:200px;overflow:hidden}
+.cov-dd.active{display:block}
+.cov-dd button{display:flex;align-items:center;gap:8px;width:100%;padding:11px 16px;border:none;background:none;font-size:.84rem;font-family:inherit;color:var(--text);cursor:pointer;transition:background .15s}
+.cov-dd button:hover{background:var(--accent-light)}
+.cov-dd button svg{width:14px;height:14px;color:var(--text-mut)}
+.cov-dd .cov-count{padding:8px 16px;font-size:.75rem;color:var(--text-mut);border-bottom:1px solid var(--border)}
 .book-card.bc-visible{animation:fadeUp .4s ease forwards}
 .book-card.bc-hidden{opacity:0;transform:translateY(20px)}
 .controls{max-width:1200px;margin:0 auto 30px;padding:36px 40px 0;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
@@ -148,6 +159,9 @@ h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
 <select class="fsel" id="yfil"><option value="all">Все годы</option></select>
 <select class="fsel" id="rfil"><option value="all">Все рейтинги</option><option value="10">10</option><option value="9">9+</option><option value="8">8+</option><option value="7">7+</option><option value="6">6+</option><option value="low">5 и ниже</option></select>
 <select class="fsel" id="ssrt"><option value="rating-desc">По рейтингу &#8595;</option><option value="rating-asc">По рейтингу &#8593;</option><option value="title">По названию</option><option value="author">По автору</option><option value="year-desc">По году &#8595;</option><option value="year-asc">По году &#8593;</option><option value="duration-desc">По длительности &#8595;</option><option value="duration-asc">По длительности &#8593;</option></select>
+<div class="cov-mgr"><button class="cov-btn" id="cov-btn" title="Обложки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+<div class="cov-dd" id="cov-dd"><div class="cov-count" id="cov-count">Обложек: 0</div><button onclick="exportCovers()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Экспорт обложек</button>
+<button onclick="importCovers()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Импорт обложек</button></div></div>
 <div class="export-wrap"><button class="export-btn" id="exp-btn" title="Экспорт"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
 <div class="export-dd" id="exp-dd"><button onclick="exportCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>CSV</button>
 <button onclick="exportPrint()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Печать / PDF</button></div></div>
@@ -244,7 +258,7 @@ rStats();populateYears();
 document.getElementById('ctrls').style.display='flex';
 document.getElementById('bgrid').style.display='grid';
 document.getElementById('ftr').style.display='block';
-loadAllUC().then(function(){rBooks()}).catch(function(){rBooks()})}
+loadAllUC().then(function(){updateCovCount();rBooks()}).catch(function(){rBooks()})}
 
 function rStats(){
 var tb=AB.length,th=0,tr=0;
@@ -384,6 +398,50 @@ html+='</tbody></table></body></html>';
 w.document.write(html);w.document.close();
 setTimeout(function(){w.print()},300)}
 
+/* ====== COVERS EXPORT / IMPORT ====== */
+function updateCovCount(){
+var cnt=Object.keys(ucCache).length;
+var el=document.getElementById('cov-count');
+if(el)el.textContent='Обложек: '+cnt}
+
+function exportCovers(){
+document.getElementById('cov-dd').classList.remove('active');
+var keys=Object.keys(ucCache);
+if(keys.length===0){alert('Нет сохранённых обложек для экспорта.');return}
+var data=JSON.stringify(ucCache);
+var blob=new Blob([data],{type:'application/json'});
+var url=URL.createObjectURL(blob);
+var a=document.createElement('a');a.href=url;a.download='book_covers_backup.json';a.click();
+URL.revokeObjectURL(url)}
+
+function importCovers(){
+document.getElementById('cov-dd').classList.remove('active');
+var inp=document.createElement('input');inp.type='file';inp.accept='.json';
+inp.onchange=function(){
+var file=inp.files[0];if(!file)return;
+var reader=new FileReader();
+reader.onload=function(){
+try{
+var data=JSON.parse(reader.result);
+var keys=Object.keys(data);
+if(keys.length===0){alert('Файл пуст.');return}
+openUCDB().then(function(db){
+var tx=db.transaction(UC_STORE,'readwrite');
+var st=tx.objectStore(UC_STORE);
+var imported=0;
+for(var i=0;i<keys.length;i++){
+ucCache[keys[i]]=data[keys[i]];
+st.put(data[keys[i]],keys[i]);
+imported++}
+tx.oncomplete=function(){
+updateCovCount();
+alert('Импортировано обложек: '+imported);
+rBooks()};
+tx.onerror=function(){alert('Ошибка при импорте!')}})
+}catch(e){alert('Неверный формат файла.')}};
+reader.readAsText(file)};
+inp.click()}
+
 /* ====== EVENT LISTENERS ====== */
 var stt;
 document.getElementById('sinp').addEventListener('input',function(){clearTimeout(stt);stt=setTimeout(rBooks,200)});
@@ -394,7 +452,11 @@ document.getElementById('ssrt').addEventListener('change',rBooks);
 document.getElementById('exp-btn').addEventListener('click',function(e){
 e.stopPropagation();
 document.getElementById('exp-dd').classList.toggle('active')});
-document.addEventListener('click',function(){document.getElementById('exp-dd').classList.remove('active')});
+document.getElementById('cov-btn').addEventListener('click',function(e){
+e.stopPropagation();
+updateCovCount();
+document.getElementById('cov-dd').classList.toggle('active')});
+document.addEventListener('click',function(){document.getElementById('exp-dd').classList.remove('active');document.getElementById('cov-dd').classList.remove('active')});
 
 /* ====== MIGRATE OLD LOCALSTORAGE COVERS TO INDEXEDDB ====== */
 (function(){try{var old=localStorage.getItem('bklib_user_cov');if(old){var data=JSON.parse(old);var keys=Object.keys(data);if(keys.length>0){openUCDB().then(function(db){var tx=db.transaction(UC_STORE,'readwrite');var st=tx.objectStore(UC_STORE);for(var i=0;i<keys.length;i++){ucCache[keys[i]]=data[keys[i]];st.put(data[keys[i]],keys[i])}tx.oncomplete=function(){localStorage.removeItem('bklib_user_cov')}})}}}catch(e){}})();
