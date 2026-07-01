@@ -499,6 +499,26 @@ document.addEventListener('click',function(){document.getElementById('exp-dd').c
 /* ====== MIGRATE OLD LOCALSTORAGE COVERS TO INDEXEDDB ====== */
 (function(){try{var old=localStorage.getItem('bklib_user_cov');if(old){var data=JSON.parse(old);var keys=Object.keys(data);if(keys.length>0){openUCDB().then(function(db){var tx=db.transaction(UC_STORE,'readwrite');var st=tx.objectStore(UC_STORE);for(var i=0;i<keys.length;i++){ucCache[keys[i]]=data[keys[i]];st.put(data[keys[i]],keys[i])}tx.oncomplete=function(){localStorage.removeItem('bklib_user_cov')}})}}}catch(e){}})();
 
+/* ====== AUTO-IMPORT COVERS FROM BACKUP ====== */
+function autoImportCovers(){
+var BACKUP_KEY='bklib_backup_imported_v1';
+if(localStorage.getItem(BACKUP_KEY))return;
+loadAllUC().then(function(){
+var localCount=Object.keys(ucCache).length;
+if(localCount>=200)return;
+fetch('book_covers_backup.json').then(function(r){return r.json()}).then(function(data){
+var keys=Object.keys(data);if(keys.length===0)return;
+openUCDB().then(function(db){
+var tx=db.transaction(UC_STORE,'readwrite');
+var st=tx.objectStore(UC_STORE);
+for(var i=0;i<keys.length;i++){
+if(!ucCache[keys[i]]){ucCache[keys[i]]=data[keys[i]];st.put(data[keys[i]],keys[i])}}
+tx.oncomplete=function(){localStorage.setItem(BACKUP_KEY,'1');updateCovCount();rBooks()};
+tx.onerror=function(){console.log('Cover import error')}})
+}).catch(function(){})})
+}
+autoImportCovers();
+
 /* ====== LOAD VIA JSONP ====== */
 (function(){
 var sid='1QN33Kzrfc-ErWGPpPua8KGNRgn840t3e78XAs2PogAQ';

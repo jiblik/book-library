@@ -1,6 +1,6 @@
 // Service Worker — Network-first strategy
 // Always fetches fresh content, falls back to cache when offline
-var CACHE = 'bklib-v1';
+var CACHE = 'bklib-v2';
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();
