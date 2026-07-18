@@ -163,11 +163,25 @@ h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
 .modal-inner{padding:0 16px 20px}.modal-inner h2{font-size:1rem}
 .footer{padding:24px 12px}.f-stats{gap:16px}.f-num{font-size:1.5rem}
 }
+.lang-toggle{position:absolute;top:0;right:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.85rem;font-weight:600;padding:6px 16px;border-radius:20px;cursor:pointer;transition:all .2s;z-index:2;font-family:'DM Sans',sans-serif}
+.lang-toggle:hover{background:rgba(232,98,10,.3);border-color:rgba(232,98,10,.5)}
+[dir="rtl"] .lang-toggle{right:auto;left:0}
+[dir="rtl"] .search-box svg{left:auto;right:16px}
+[dir="rtl"] .search-box input{padding:14px 48px 14px 18px}
+[dir="rtl"] .fsel{background-position:left 14px center;padding:14px 18px 14px 40px}
+[dir="rtl"] .bcl{margin-left:0;margin-right:auto}
+[dir="rtl"] .b-info{text-align:right}
+[dir="rtl"] .b-author{direction:rtl}
+[dir="rtl"] .modal-inner .m-ann{text-align:right}
+[dir="rtl"] .hero{direction:rtl}
+[dir="rtl"] .controls{direction:rtl}
+[dir="rtl"] .footer{direction:rtl}
 ::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--text-mut)}
 </style>
 </head>
 <body>
 <section class="hero"><div class="hero-content">
+<button class="lang-toggle" id="lang-tog" onclick="setLang(curLang==='ru'?'he':'ru')">עב</button>
 <div class="hero-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Аудиобиблиотека</div>
 <h1>Моя библиотека</h1>
 <p class="hero-sub">Персональная коллекция прослушанных аудиокниг с рейтингами и заметками</p>
@@ -237,8 +251,8 @@ function openUCDB(){return new Promise(function(resolve,reject){if(ucDB){resolve
 function loadAllUC(){return openUCDB().then(function(db){return new Promise(function(resolve){var tx=db.transaction(UC_STORE,'readonly');var st=tx.objectStore(UC_STORE);var req=st.getAll();var reqK=st.getAllKeys();var vals,keys;req.onsuccess=function(){vals=req.result};reqK.onsuccess=function(){keys=reqK.result};tx.oncomplete=function(){for(var i=0;i<keys.length;i++)ucCache[keys[i]]=vals[i];resolve(ucCache)};tx.onerror=function(){resolve(ucCache)}})})}
 function setUC(title,dataURL){var k=title.trim().toLowerCase();ucCache[k]=dataURL;return openUCDB().then(function(db){return new Promise(function(resolve,reject){var tx=db.transaction(UC_STORE,'readwrite');tx.objectStore(UC_STORE).put(dataURL,k);tx.oncomplete=function(){resolve(true)};tx.onerror=function(){reject(tx.error)}})})}
 function hasUC(title){return ucCache[title.trim().toLowerCase()]||null}
-function uploadCover(title,img){var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){var file=inp.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(){var image=new Image();image.onload=function(){var cvs=document.createElement('canvas');var maxW=400,w=image.width,h=image.height;if(w>maxW){h=Math.round(h*(maxW/w));w=maxW}cvs.width=w;cvs.height=h;var ctx=cvs.getContext('2d');ctx.drawImage(image,0,0,w,h);var dataURL=cvs.toDataURL('image/jpeg',0.82);setUC(title,dataURL).then(function(){showCov(img,dataURL);showSaveOk(img)}).catch(function(){alert('Ошибка сохранения обложки!')})};image.src=reader.result};reader.readAsDataURL(file)};inp.click()}
-function showSaveOk(img){var card=img.closest('.book-card');if(!card)return;var dot=document.createElement('div');dot.style.cssText='position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:13px;font-weight:600;padding:4px 14px;border-radius:12px;z-index:70;pointer-events:none;transition:opacity .5s';dot.textContent='✓ Сохранено';card.appendChild(dot);setTimeout(function(){dot.style.opacity='0';setTimeout(function(){dot.remove()},500)},1500)}
+function uploadCover(title,img){var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){var file=inp.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(){var image=new Image();image.onload=function(){var cvs=document.createElement('canvas');var maxW=400,w=image.width,h=image.height;if(w>maxW){h=Math.round(h*(maxW/w));w=maxW}cvs.width=w;cvs.height=h;var ctx=cvs.getContext('2d');ctx.drawImage(image,0,0,w,h);var dataURL=cvs.toDataURL('image/jpeg',0.82);setUC(title,dataURL).then(function(){showCov(img,dataURL);showSaveOk(img)}).catch(function(){alert(LANG[curLang].errCover)})};image.src=reader.result};reader.readAsDataURL(file)};inp.click()}
+function showSaveOk(img){var card=img.closest('.book-card');if(!card)return;var dot=document.createElement('div');dot.style.cssText='position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:13px;font-weight:600;padding:4px 14px;border-radius:12px;z-index:70;pointer-events:none;transition:opacity .5s';dot.textContent=LANG[curLang].saved;card.appendChild(dot);setTimeout(function(){dot.style.opacity='0';setTimeout(function(){dot.remove()},500)},1500)}
 
 /* ====== COVER CACHE ====== */
 var CCK='bklib_cov_v7',CCE=7*864e5;
@@ -263,7 +277,7 @@ if(typeof v==='string'){v=v.trim();var h3b=v.match(/^(\d+):(\d+):(\d+)$/);if(h3b
 if(typeof v==='number')return v;
 return 0}
 
-function fdd(h){if(!h||h===0)return'';var hr=Math.floor(h),mn=Math.round((h-hr)*60);if(hr===0)return mn+' мин';if(mn===0)return hr+' ч';return hr+' ч '+mn+' мин'}
+function fdd(h){if(!h||h===0)return'';var t=LANG[curLang];var hr=Math.floor(h),mn=Math.round((h-hr)*60);if(hr===0)return mn+' '+t.m;if(mn===0)return hr+' '+t.h;return hr+' '+t.h+' '+mn+' '+t.m}
 
 /* ====== STARS ====== */
 function stH(rat){
@@ -273,6 +287,100 @@ if(i<=Math.floor(s5))h+='<svg class="sf" viewBox="0 0 24 24" fill="currentColor"
 else if(i-0.5<=s5)h+='<svg class="sf" viewBox="0 0 24 24" fill="currentColor" opacity="0.6"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
 else h+='<svg class="se" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'}
 return h}
+
+/* ====== LANG ====== */
+var LANG={
+ru:{
+label:'Аудиобиблиотека',title:'Моя библиотека',sub:'Персональная коллекция прослушанных аудиокниг с рейтингами и заметками',
+stBooks:'Книг',stHours:'Часов',stRating:'Средний рейтинг',stAuthors:'Авторов',
+search:'Поиск по названию или автору...',
+allYears:'Все годы',allRatings:'Все рейтинги',allLangs:'Все языки',langRu:'Русский',langHe:'Иврит',
+r5:'5 и ниже',
+sortRatingD:'По рейтингу ↓',sortRatingA:'По рейтингу ↑',sortTitle:'По названию',sortAuthor:'По автору',
+sortYearD:'По году ↓',sortYearA:'По году ↑',sortDurD:'По длительности ↓',sortDurA:'По длительности ↑',
+shown:'Показано:',
+covTitle:'Обложки',covCount:'Обложек:',covExport:'Экспорт обложек',covImport:'Импорт обложек',
+expTitle:'Экспорт',
+noResTitle:'Ничего не найдено',noResSub:'Попробуйте изменить параметры поиска',
+loading:'Загрузка библиотеки...',
+fBooks:'Книг прослушано',fHours:'Часов аудио',fDays:'Дней непрерывного слушания',
+fNote:'Данные загружаются из Google Sheets автоматически',
+h:'ч',m:'мин',
+errLoad:'Не удалось загрузить данные.',errReload:'Проверьте интернет и перезагрузите страницу.',
+errCover:'Ошибка сохранения обложки!',saved:'✓ Сохранено',
+noCovers:'Нет сохранённых обложек для экспорта.',badFile:'Неверный формат файла.',impErr:'Ошибка при импорте!',
+fileEmpty:'Файл пуст.',impDone:'Импортировано обложек:',
+printTitle:'Моя библиотека',
+printName:'Название',printAuthor:'Автор',printYear:'Год',printRating:'Рейтинг',printDur:'Длительность',
+printPdf:'Печать / PDF',
+togBtn:'עב',dir:'ltr'
+},
+he:{
+label:'ספריית אודיו',title:'הספרייה שלי',sub:'אוסף אישי של ספרי אודיו עם דירוגים והערות',
+stBooks:'ספרים',stHours:'שעות',stRating:'דירוג ממוצע',stAuthors:'סופרים',
+search:'חיפוש לפי שם או מחבר...',
+allYears:'כל השנים',allRatings:'כל הדירוגים',allLangs:'כל השפות',langRu:'רוסית',langHe:'עברית',
+r5:'5 ומטה',
+sortRatingD:'לפי דירוג ↓',sortRatingA:'לפי דירוג ↑',sortTitle:'לפי שם',sortAuthor:'לפי מחבר',
+sortYearD:'לפי שנה ↓',sortYearA:'לפי שנה ↑',sortDurD:'לפי אורך ↓',sortDurA:'לפי אורך ↑',
+shown:'מוצגים:',
+covTitle:'עטיפות',covCount:'עטיפות:',covExport:'ייצוא עטיפות',covImport:'ייבוא עטיפות',
+expTitle:'ייצוא',
+noResTitle:'לא נמצאו תוצאות',noResSub:'נסו לשנות את פרמטרי החיפוש',
+loading:'טוען ספרייה...',
+fBooks:'ספרים שנשמעו',fHours:'שעות אודיו',fDays:'ימי האזנה רצופים',
+fNote:'הנתונים נטענים אוטומטית מ-Google Sheets',
+h:'שע׳',m:'דק׳',
+errLoad:'טעינת הנתונים נכשלה.',errReload:'בדקו את החיבור לאינטרנט ורעננו את הדף.',
+errCover:'שגיאה בשמירת העטיפה!',saved:'✓ נשמר',
+noCovers:'אין עטיפות שמורות לייצוא.',badFile:'פורמט קובץ לא תקין.',impErr:'שגיאה בייבוא!',
+fileEmpty:'הקובץ ריק.',impDone:'עטיפות יובאו:',
+printTitle:'הספרייה שלי',
+printName:'שם',printAuthor:'מחבר',printYear:'שנה',printRating:'דירוג',printDur:'אורך',
+printPdf:'הדפסה / PDF',
+togBtn:'RU',dir:'rtl'
+}};
+var curLang=localStorage.getItem('bklib_lang')||'ru';
+
+function setLang(lang){
+curLang=lang;localStorage.setItem('bklib_lang',lang);
+var t=LANG[lang],d=t.dir;
+document.documentElement.setAttribute('dir',d);
+document.documentElement.setAttribute('lang',lang);
+document.getElementById('lang-tog').textContent=t.togBtn;
+document.querySelector('.hero-label').lastChild.textContent=t.label;
+document.querySelector('.hero h1').textContent=t.title;
+document.querySelector('.hero-sub').textContent=t.sub;
+var lbls=document.querySelectorAll('.stat-lbl');
+lbls[0].textContent=t.stBooks;lbls[1].textContent=t.stHours;
+lbls[2].textContent=t.stRating;lbls[3].textContent=t.stAuthors;
+document.getElementById('sinp').setAttribute('placeholder',t.search);
+var yf=document.getElementById('yfil');yf.options[0].textContent=t.allYears;
+var rf=document.getElementById('rfil');
+rf.options[0].textContent=t.allRatings;rf.options[6].textContent=t.r5;
+var lfl=document.getElementById('lfil');
+lfl.options[0].textContent=t.allLangs;lfl.options[1].textContent=t.langRu;lfl.options[2].textContent=t.langHe;
+var ss=document.getElementById('ssrt');
+ss.options[0].textContent=t.sortRatingD;ss.options[1].textContent=t.sortRatingA;
+ss.options[2].textContent=t.sortTitle;ss.options[3].textContent=t.sortAuthor;
+ss.options[4].textContent=t.sortYearD;ss.options[5].textContent=t.sortYearA;
+ss.options[6].textContent=t.sortDurD;ss.options[7].textContent=t.sortDurA;
+document.getElementById('cov-btn').setAttribute('title',t.covTitle);
+document.getElementById('exp-btn').setAttribute('title',t.expTitle);
+var bclEl=document.querySelector('.bcl');
+if(bclEl)bclEl.firstChild.textContent=t.shown+' ';
+document.querySelector('.ldt').textContent=t.loading;
+var flbls=document.querySelectorAll('.f-lbl');
+flbls[0].textContent=t.fBooks;flbls[1].textContent=t.fHours;flbls[2].textContent=t.fDays;
+document.querySelector('.f-txt').textContent=t.fNote;
+var covDd=document.getElementById('cov-dd');
+if(covDd){var cbs=covDd.querySelectorAll('button');
+if(cbs[0])cbs[0].lastChild.textContent=t.covExport;
+if(cbs[1])cbs[1].lastChild.textContent=t.covImport;}
+var expDd=document.getElementById('exp-dd');
+if(expDd){var ebs=expDd.querySelectorAll('button');
+if(ebs[1])ebs[1].lastChild.textContent=' '+t.printPdf;}
+}
 
 /* ====== MAIN ====== */
 var AB=[];
@@ -364,7 +472,7 @@ default:return 0}});
 curFiltered=f;
 document.getElementById('shcnt').textContent=f.length;
 var g=document.getElementById('bgrid');g.innerHTML='';
-if(f.length===0){g.innerHTML='<div class="no-res"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 11h6"/></svg><h3>Ничего не найдено</h3><p>Попробуйте изменить параметры поиска</p></div>';return}
+if(f.length===0){g.innerHTML='<div class="no-res"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 11h6"/></svg><h3>'+LANG[curLang].noResTitle+'</h3><p>'+LANG[curLang].noResSub+'</p></div>';return}
 initObserver();
 for(var i=0;i<f.length;i++){
 var b=f[i],c=document.createElement('div');c.className='book-card bc-hidden';
@@ -415,7 +523,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()
 
 /* ====== EXPORT ====== */
 function exportCSV(){
-var rows=['Название;Автор;Год;Рейтинг;Длительность'];
+var t=LANG[curLang];var rows=[t.printName+';'+t.printAuthor+';'+t.printYear+';'+t.printRating+';'+t.printDur];
 var data=curFiltered.length?curFiltered:AB;
 for(var i=0;i<data.length;i++){
 var b=data[i];
@@ -430,10 +538,11 @@ document.getElementById('exp-dd').classList.remove('active')}
 function exportPrint(){
 document.getElementById('exp-dd').classList.remove('active');
 var data=curFiltered.length?curFiltered:AB;
+var t=LANG[curLang];
 var w=window.open('','_blank');
-var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Моя библиотека</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#1a1a1a}h1{font-size:1.5rem;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:.85rem}th,td{border:1px solid #ddd;padding:8px 10px;text-align:left}th{background:#f5f0eb;font-weight:600}tr:nth-child(even){background:#fafaf8}.r{text-align:center}.d{white-space:nowrap}@media print{body{padding:10px}}</style></head><body>';
-html+='<h1>Моя библиотека — '+data.length+' книг</h1>';
-html+='<table><thead><tr><th>#</th><th>Название</th><th>Автор</th><th>Год</th><th class="r">Рейтинг</th><th class="d">Длительность</th></tr></thead><tbody>';
+var html='<!DOCTYPE html><html dir="'+t.dir+'" lang="'+curLang+'"><head><meta charset="UTF-8"><title>'+t.printTitle+'</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#1a1a1a}h1{font-size:1.5rem;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:.85rem}th,td{border:1px solid #ddd;padding:8px 10px;text-align:left}th{background:#f5f0eb;font-weight:600}tr:nth-child(even){background:#fafaf8}.r{text-align:center}.d{white-space:nowrap}@media print{body{padding:10px}}</style></head><body>';
+html+='<h1>'+t.printTitle+' — '+data.length+'</h1>';
+html+='<table><thead><tr><th>#</th><th>'+t.printName+'</th><th>'+t.printAuthor+'</th><th>'+t.printYear+'</th><th class="r">'+t.printRating+'</th><th class="d">'+t.printDur+'</th></tr></thead><tbody>';
 for(var i=0;i<data.length;i++){
 var b=data[i];
 html+='<tr><td>'+(i+1)+'</td><td>'+b.title+'</td><td>'+b.author+'</td><td>'+(b.year||'')+'</td><td class="r">'+b.rating+'</td><td class="d">'+fdd(b.dur)+'</td></tr>'}
@@ -445,12 +554,12 @@ setTimeout(function(){w.print()},300)}
 function updateCovCount(){
 var cnt=Object.keys(ucCache).length;
 var el=document.getElementById('cov-count');
-if(el)el.textContent='Обложек: '+cnt}
+if(el)el.textContent=LANG[curLang].covCount+' '+cnt}
 
 function exportCovers(){
 document.getElementById('cov-dd').classList.remove('active');
 var keys=Object.keys(ucCache);
-if(keys.length===0){alert('Нет сохранённых обложек для экспорта.');return}
+if(keys.length===0){alert(LANG[curLang].noCovers);return}
 var data=JSON.stringify(ucCache);
 var blob=new Blob([data],{type:'application/json'});
 var url=URL.createObjectURL(blob);
@@ -467,7 +576,7 @@ reader.onload=function(){
 try{
 var data=JSON.parse(reader.result);
 var keys=Object.keys(data);
-if(keys.length===0){alert('Файл пуст.');return}
+if(keys.length===0){alert(LANG[curLang].fileEmpty);return}
 openUCDB().then(function(db){
 var tx=db.transaction(UC_STORE,'readwrite');
 var st=tx.objectStore(UC_STORE);
@@ -478,10 +587,10 @@ st.put(data[keys[i]],keys[i]);
 imported++}
 tx.oncomplete=function(){
 updateCovCount();
-alert('Импортировано обложек: '+imported);
+alert(LANG[curLang].impDone+' '+imported);
 rBooks()};
-tx.onerror=function(){alert('Ошибка при импорте!')}})
-}catch(e){alert('Неверный формат файла.')}};
+tx.onerror=function(){alert(LANG[curLang].impErr)}})
+}catch(e){alert(LANG[curLang].badFile)}};
 reader.readAsText(file)};
 inp.click()}
 
@@ -530,11 +639,13 @@ autoImportCovers();
 var sid='1QN33Kzrfc-ErWGPpPua8KGNRgn840t3e78XAs2PogAQ';
 var url='https://docs.google.com/spreadsheets/d/'+sid+'/gviz/tq?tqx=responseHandler:handleSheetData';
 var s=document.createElement('script');s.src=url;
-s.onerror=function(){document.getElementById('loading').innerHTML='<div style="color:var(--accent);font-size:1.1rem"><p>Не удалось загрузить данные.</p><p style="font-size:.9rem;color:var(--text-mut);margin-top:8px">Проверьте интернет и перезагрузите страницу.</p></div>'};
+s.onerror=function(){document.getElementById('loading').innerHTML='<div style="color:var(--accent);font-size:1.1rem"><p>'+LANG[curLang].errLoad+'</p><p style="font-size:.9rem;color:var(--text-mut);margin-top:8px">'+LANG[curLang].errReload+'</p></div>'};
 document.head.appendChild(s)})();
 
 /* ====== SERVICE WORKER ====== */
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
+
+setLang(curLang);
 </script>
 </body>
 </html>
