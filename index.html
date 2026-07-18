@@ -196,6 +196,7 @@ h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
 <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="sinp" placeholder="Поиск по названию или автору..."></div>
 <select class="fsel" id="yfil"><option value="all">Все годы</option></select>
 <select class="fsel" id="rfil"><option value="all">Все рейтинги</option><option value="10">10</option><option value="9">9+</option><option value="8">8+</option><option value="7">7+</option><option value="6">6+</option><option value="low">5 и ниже</option></select>
+<select class="fsel" id="lfil"><option value="all">Все языки</option><option value="ru">Русский</option><option value="he">Иврит</option></select>
 <select class="fsel" id="ssrt"><option value="rating-desc">По рейтингу &#8595;</option><option value="rating-asc">По рейтингу &#8593;</option><option value="title">По названию</option><option value="author">По автору</option><option value="year-desc">По году &#8595;</option><option value="year-asc">По году &#8593;</option><option value="duration-desc">По длительности &#8595;</option><option value="duration-asc">По длительности &#8593;</option></select>
 <div class="cov-mgr"><button class="cov-btn" id="cov-btn" title="Обложки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
 <div class="cov-dd" id="cov-dd"><div class="cov-count" id="cov-count">Обложек: 0</div><button onclick="exportCovers()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Экспорт обложек</button>
@@ -332,10 +333,13 @@ for(var i=0;i<entries.length;i++){
 if(entries[i].isIntersecting){entries[i].target.classList.remove('bc-hidden');entries[i].target.classList.add('bc-visible');cardObserver.unobserve(entries[i].target)}}
 },{threshold:0.1,rootMargin:'50px'})}
 
+function detectLang(title){var c=title.charCodeAt(0);if(c>=0x0590&&c<=0x05FF)return'he';return'ru'}
+
 function rBooks(){
 var search=document.getElementById('sinp').value.toLowerCase();
 var rf=document.getElementById('rfil').value;
 var yf=document.getElementById('yfil').value;
+var lf=document.getElementById('lfil').value;
 var sb=document.getElementById('ssrt').value;
 var f=[];
 for(var i=0;i<AB.length;i++){var b=AB[i];
@@ -344,7 +348,8 @@ var mr=true;
 if(rf==='low')mr=b.rating<=5;
 else if(rf!=='all')mr=b.rating>=parseInt(rf);
 var my=yf==='all'||b.year==parseInt(yf);
-if(ms&&mr&&my)f.push(b)}
+var ml=lf==='all'||detectLang(b.title)===lf;
+if(ms&&mr&&my&&ml)f.push(b)}
 f.sort(function(a,b){
 switch(sb){
 case'rating-desc':return b.rating-a.rating||a.title.localeCompare(b.title);
@@ -485,6 +490,7 @@ var stt;
 document.getElementById('sinp').addEventListener('input',function(){clearTimeout(stt);stt=setTimeout(rBooks,200)});
 document.getElementById('rfil').addEventListener('change',rBooks);
 document.getElementById('yfil').addEventListener('change',rBooks);
+document.getElementById('lfil').addEventListener('change',rBooks);
 document.getElementById('ssrt').addEventListener('change',rBooks);
 
 document.getElementById('exp-btn').addEventListener('click',function(e){
