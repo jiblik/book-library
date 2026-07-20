@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "book-library",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", ".", "-p", "9090", "-c-1"],
+      "port": 9090,
+      "autoPort": false
+    }
+  ]
+}
