@@ -106,8 +106,7 @@ h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
 .b-stars svg{width:13px;height:13px}
 .sf{color:#FFB800}
 .se{color:#DDD8D3}
-.b-dur{font-size:.75rem;color:var(--text-mut);white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
-.dur-ic{width:12px;height:12px;opacity:.55;flex-shrink:0}
+.b-dur{font-size:.75rem;color:var(--text-mut);white-space:nowrap}
 .b-year{font-size:.72rem;color:var(--text-mut);margin-top:4px}
 .b-ann{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(26,26,26,.92);color:#fff;font-size:.82rem;line-height:1.6;padding:20px 16px;border-radius:var(--rl);opacity:0;visibility:hidden;transition:all .3s;z-index:50;pointer-events:none;display:flex;align-items:center;text-align:center;justify-content:center;backdrop-filter:blur(4px)}
 .ldc{max-width:1200px;margin:0 auto;padding:80px 40px;text-align:center}
@@ -136,14 +135,11 @@ h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
 .fsel{padding:10px 32px 10px 12px;font-size:.82rem;flex:1 1 calc(50% - 4px);min-width:calc(50% - 4px)}
 .cov-btn,.export-btn{width:38px;height:38px}.cov-btn svg,.export-btn svg{width:16px;height:16px}
 .bcl{flex:1;text-align:right;font-size:.82rem;margin-left:0}
-.book-grid{padding:0 10px 32px;gap:12px 10px;grid-template-columns:repeat(3,1fr)}
-.book-card{border:none;background:transparent;border-radius:10px;overflow:visible}
-.book-card:hover{transform:none;box-shadow:none}
-.book-cover{aspect-ratio:1/1;border-radius:10px;box-shadow:var(--sh-sm)}
-.b-info{padding:6px 2px 0;text-align:center}
-.b-title,.b-author,.b-stars,.b-year{display:none}
-.b-meta{justify-content:center;margin:0}
-.b-dur{font-size:.62rem;color:var(--text-sec);text-transform:uppercase;letter-spacing:.2px}
+.book-grid{padding:0 10px 32px;gap:8px;grid-template-columns:repeat(3,1fr)}
+.book-card:hover{transform:none;box-shadow:var(--sh-md)}
+.b-info{padding:7px 6px 9px}
+.b-title{font-size:.72rem;line-height:1.25;margin-bottom:2px;-webkit-line-clamp:2}.b-author{font-size:.64rem;margin-bottom:0}
+.b-meta{margin-top:4px}.b-stars{display:none}.b-dur{font-size:.62rem}.b-year{display:none}
 .brb{font-size:.65rem;padding:2px 6px;top:5px;right:5px}.brb svg{width:9px;height:9px}
 .b-upl{opacity:1;pointer-events:auto;width:26px;height:26px;top:5px;left:5px}.b-upl svg{width:13px;height:13px}
 .b-ann{display:none}
@@ -162,8 +158,8 @@ h1,h2,h3,h4{font-family:'DM Sans',sans-serif}
 .controls{padding:16px 10px 0;gap:6px}
 .search-box input{padding:10px 14px 10px 38px;font-size:.84rem}
 .fsel{padding:9px 28px 9px 10px;font-size:.78rem}
-.book-grid{padding:0 8px 24px;gap:10px 8px;grid-template-columns:repeat(3,1fr)}
-.b-dur{font-size:.58rem}
+.book-grid{padding:0 8px 24px;gap:6px;grid-template-columns:repeat(3,1fr)}
+.b-info{padding:6px 5px 8px}.b-title{font-size:.68rem}.b-author{font-size:.6rem}
 .modal-inner{padding:0 16px 20px}.modal-inner h2{font-size:1rem}
 .footer{padding:24px 12px}.f-stats{gap:16px}.f-num{font-size:1.5rem}
 }
@@ -487,7 +483,7 @@ var ann=AN[b.title]||'',ds=fdd(b.dur),ys=b.year?b.year:'';
 c.innerHTML='<button class="b-upl" title="Загрузить обложку"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>'+
 (ann?'<div class="b-ann">'+ann+'</div>':'')+
 '<div class="book-cover"><div class="c-ph"><svg class="phi" viewBox="0 0 24 24" fill="none" stroke="#9B9590" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="pht">'+b.title+'</span></div><img style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" alt="'+b.title+'"><div class="brb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'+b.rating+'</div></div>'+
-'<div class="b-info"><div class="b-title">'+b.title+'</div><div class="b-author">'+b.author+'</div><div class="b-meta"><div class="b-stars">'+stH(b.rating)+'</div>'+(ds?'<span class="b-dur"><svg class="dur-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>'+ds+'</span>':'')+'</div>'+(ys?'<div class="b-year">'+ys+'</div>':'')+'</div>';
+'<div class="b-info"><div class="b-title">'+b.title+'</div><div class="b-author">'+b.author+'</div><div class="b-meta"><div class="b-stars">'+stH(b.rating)+'</div><span class="b-dur">'+ds+'</span></div>'+(ys?'<div class="b-year">'+ys+'</div>':'')+'</div>';
 g.appendChild(c);
 if(cardObserver)cardObserver.observe(c);else{c.classList.remove('bc-hidden');c.classList.add('bc-visible')}
 var covImg=c.querySelector('.book-cover img');
